@@ -1,7 +1,7 @@
 <!--
 ---
-id: 001
-title: iikoo
+id: BUG_001
+title: gthdsq
 priority: 
 severity: 
 status: Open
@@ -10,7 +10,7 @@ author:
 ---
 -->
 
-## 🐞 001 / iikoo
+## 🐞 BUG_001 / gthdsq
 ### 📅 Date: 2025-05-15
 ### 💻 Environment: 
 ### 🚦 Priority: 

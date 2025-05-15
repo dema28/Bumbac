@@ -3,8 +3,8 @@ name: 🐞 Create Bug Card
 on:
   push:
     paths:
-      - 'bug_reports/**.md'
-      - 'scripts/create_bug_issue_and_card.py'
+      - "bug_reports/**.md"
+      - "scripts/create_bug_issue_and_card.py"
 
 jobs:
   create-card:
@@ -16,14 +16,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: pip install pyyaml requests
 
       - name: Run create_bug_issue_and_card.py
         env:
-          GH_PROJECT_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_PROJECT_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
         run: |
           python scripts/create_bug_issue_and_card.py > log.txt 2>&1 || echo "Script failed"
 

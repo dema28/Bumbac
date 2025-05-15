@@ -8,7 +8,7 @@ PROJECT_ID = "PVT_kwHOCjPm584A5Fy2"
 STATUS_FIELD_ID = "PVTSSF_lAHOCjPm584A5Fy2zgt8rEs"
 BUGS_OPTION_ID = "930de63c"
 
-GH_TOKEN = os.environ.get("GH_TOKEN")
+GH_TOKEN = os.environ.get("GH_PROJECT_TOKEN")
 HEADERS = {
     "Authorization": f"Bearer {GH_TOKEN}",
     "Accept": "application/vnd.github+json"
