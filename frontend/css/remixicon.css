@@ -1,0 +1,24 @@
+
+/* Minimal RemixIcon CSS placeholder */
+.ri-search-line::before { content: "\ed60"; }
+.ri-shopping-bag-line::before { content: "\ed6f"; }
+.ri-menu-line::before { content: "\ed5d"; }
+.ri-download-line::before { content: "\ecae"; }
+.ri-play-fill::before { content: "\ed1e"; }
+.ri-facebook-fill::before { content: "\ed2e"; }
+.ri-instagram-line::before { content: "\ed35"; }
+.ri-pinterest-line::before { content: "\ed37"; }
+.ri-youtube-line::before { content: "\ed3c"; }
+.ri-visa-fill::before, .ri-mastercard-fill::before, .ri-paypal-fill::before, .ri-apple-fill::before {
+  content: "\ec01"; /* Dummy values */
+}
+[class^="ri-"], [class*=" ri-"] {
+  font-family: "remixicon" !important;
+  font-style: normal;
+  font-weight: normal;
+  speak: never;
+  display: inline-block;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>tailwind.config = { theme: { extend: { colors: { primary: '#d4b98c', secondary: '#f8f5f0' }, borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' } } } }</script>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Poppins:wght@300;400;500;600&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+  <style>
+    :where([class^="ri-"])::before {
+      content: "\f3c2";
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .serif {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .hero-section {
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .product-card:hover img {
+      transform: scale(1.05);
+      transition: transform 0.3s ease;
+    }
+
+    .product-card img {
+      transition: transform 0.3s ease;
+    }
+
+    .pattern-card:hover .overlay {
+      opacity: 1;
+    }
+
+    .nav-link {
+      position: relative;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #d4b98c;
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .active::after {
+      width: 100%;
+    }
+  </style>
+  <link href="css/tailwind.css" rel="stylesheet">
+  <link href="css/fonts.css" rel="stylesheet">
+  <link href="css/remixicon.css" rel="stylesheet">
+  </link>
+  </link>
+  </link>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Вход — AlizeMold</title>
+
+
+</head>
+
+<body class="bg-secondary text-gray-900 font-sans">
+  <main class="min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white shadow rounded-lg p-8 w-full max-w-md">
+      <h1 class="text-2xl font-serif font-semibold text-primary text-center mb-6">Вход в аккаунт</h1>
+      <div class="flex justify-between items-center mb-4 text-sm">
+        <a href="/index.html" class="flex items-center text-primary hover:underline gap-1">
+          <img src="/assets/icons/fonts/arrow-left-circle-line.svg" class="w-4 h-4" alt="Домой">
+          <span>Домой</span>
+        </a>
+        <a href="javascript:history.back()"
+          class="flex flex-row-reverse items-center text-primary hover:underline gap-1">
+          <img src="/assets/icons/fonts/arrow-right-circle-line.svg" class="w-4 h-4" alt="Назад">
+          <span>Назад</span>
+        </a>
+      </div>
+      <form class="space-y-4" id="login-form">
+        <div>
+          <label class="block text-sm font-medium mb-1">Email</label>
+          <input class="w-full border rounded-button px-4 py-2" id="email" required type="email" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Пароль</label>
+          <input class="w-full border rounded-button px-4 py-2" id="password" required type="password" />
+        </div>
+
+        <!-- Блок ошибки -->
+        <p id="login-error" class="text-red-500 text-sm hidden mt-1">
+          Неверный email или пароль
+        </p>
+
+        <button class="bg-primary text-white w-full py-2 rounded-button hover:bg-opacity-90 transition"
+          type="submit">Войти</button>
+      </form>
+
+      <p class="text-sm text-center text-gray-600 mt-4">Нет аккаунта? <a class="text-primary hover:underline"
+          href="register.html">Зарегистрироваться</a></p>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Mobile menu toggle
+      const menuButton = document.querySelector('.ri-menu-line').parentElement;
+      const navLinks = document.querySelector('.md\\:flex');
+
+      menuButton.addEventListener('click', function () {
+        navLinks.classList.toggle('hidden');
+        navLinks.classList.toggle('flex');
+        navLinks.classList.toggle('flex-col');
+        navLinks.classList.toggle('absolute');
+        navLinks.classList.toggle('top-16');
+        navLinks.classList.toggle('left-0');
+        navLinks.classList.toggle('right-0');
+        navLinks.classList.toggle('bg-white');
+        navLinks.classList.toggle('p-6');
+        navLinks.classList.toggle('shadow-md');
+      });
+    });
+  </script>
+  <script src="js/main.module.js" type="module"></script>
+</body>
+
+</html>
