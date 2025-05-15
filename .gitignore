@@ -1,0 +1,44 @@
+
+# Node.js / Tailwind
+node_modules/
+*.log
+.tailwind-cache/
+*.exe
+frontend/tailwindcss.exe
+
+# Python
+__pycache__/
+*.pyc
+.env
+.venv/
+env/
+*.sqlite3
+
+# macOS / Windows / Linux system files
+.DS_Store
+Thumbs.db
+
+# JetBrains / VSCode / IDE
+.idea/
+.vscode/
+
+# Logs, temp
+*.log
+*.tmp
+*.bak
+
+# Git
+*.swp
+*.swo
+*.orig
+
+# Test / result folders
+reports/
+allure-results/
+allure-report/
+
+# GitHub Actions (optional temp)
+.github/workflows/*.log
+
+# Backup files
+*.zip
