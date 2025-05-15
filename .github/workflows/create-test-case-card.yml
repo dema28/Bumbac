@@ -23,7 +23,7 @@ jobs:
 
       - name: Run create_test_case_issue_and_card.py
         env:
-          GH_PROJECT_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
+          GH_PROJECT_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           python scripts/create_test_case_issue_and_card.py > log.txt 2>&1 || echo "Script failed"
 

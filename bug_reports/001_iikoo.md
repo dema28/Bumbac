@@ -1,44 +1,41 @@
 <!--
 ---
 id: 001
-title: kdfksdg
-priority: sdgsd
-severity: sgsdg
+title: iikoo
+priority: 
+severity: 
 status: Open
-environment: sgsdg
-author: sdgsdg
+environment: 
+author: 
 ---
 -->
 
-## 🐞 001 / kdfksdg
+## 🐞 001 / iikoo
 ### 📅 Date: 2025-05-15
-### 💻 Environment: sgsdg
-### 🚦 Priority: sdgsd
-### ⚠️ Severity: sgsdg
+### 💻 Environment: 
+### 🚦 Priority: 
+### ⚠️ Severity: 
 ### 📌 Status: Open
 
 ### 🔧 Preconditions / Предусловия
-sg
+
 
 ### 🔄 Steps to Reproduce / Шаги воспроизведения
-1. sg
+
 
 ### 💭 Expected Result / Ожидаемый результат
-1. sg
+
 
 ### 🚨 Actual Result / Фактический результат
-1. sg
+
 
 ### 📎 Attachments / Вложения
-- [sg](sg)
-- [sg](sg)
-- [sg](sg)
-- [](sdg)
+- Нет
 
 ### 🛠️ Suggested Solution / Предлагаемое решение
-sgs
+Нет
 
 ### 🧩 Additional Information / Дополнительная информация
-sgsd
+Нет
 
-### ✍️ Reported by: sdgsdg
+### ✍️ Reported by: 
