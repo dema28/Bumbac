@@ -1,0 +1,39 @@
+name: 📋 Create Checklist Card
+
+on:
+  push:
+    paths:
+      - 'checklists/**.md'
+      - 'scripts/create_checklist_issue_and_card.py'
+
+jobs:
+  create-card:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml requests
+
+      - name: Run create_checklist_issue_and_card.py
+        env:
+          GH_PROJECT_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
+        run: |
+          python scripts/create_checklist_issue_and_card.py > log.txt 2>&1 || echo "Script failed"
+
+      - name: Show log
+        if: always()
+        run: cat log.txt
+
+      - name: Upload log.txt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-checklist
+          path: log.txt
