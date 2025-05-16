@@ -5,6 +5,9 @@ node_modules/
 .tailwind-cache/
 *.exe
 frontend/tailwindcss.exe
+frontend/assets/icons/fonts/index.html
+
+
 
 # Python
 __pycache__/
