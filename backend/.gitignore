@@ -1,0 +1,66 @@
+# ───────── Maven / Gradle ────────────────────────────────────────
+target/
+out/
+build/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# ───────── IntelliJ IDEA / JetBrains ─────────────────────────────
+.idea/
+*.iws
+*.iml
+*.ipr
+# Rider / Android Studio JBR
+.jbr/
+
+# ───────── VS Code ───────────────────────────────────────────────
+.vscode/
+.history/
+
+# ───────── Eclipse / STS ─────────────────────────────────────────
+.settings/
+.project
+.classpath
+.cache/
+.apt_generated/
+.factorypath
+# Lombok delombok
+delombok/
+
+# ───────── OS-специфические ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ───────── Log-файлы, дампы, отчёты ──────────────────────────────
+*.log
+*.log.*
+*.tmp
+*.swp
+hs_err_pid*
+replay_pid*
+
+# Jacoco / surefire-reports / cobertura
+**/jacoco.exec
+**/surefire-reports/
+**/test-output/
+**/coverage.*
+
+# ───────── Docker / Kubernetes ───────────────────────────────────
+docker-compose.override.yml
+docker/*.env
+
+# ───────── Runtime uploads / cache ───────────────────────────────
+uploads/
+.cache/
+tmp/
+
+# ───────── Node / Frontend (если есть) ───────────────────────────
+node_modules/
+*.npm-debug.log
+dist/
+.env
+.env.*
+
+# ───────── Mac M1 / Gradle native 호출 ─────────────────────────
+.gradle/
