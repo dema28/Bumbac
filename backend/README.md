@@ -1,6 +1,6 @@
 # 🧵 Bumbac.md — Backend
 
-Java 17 + Spring Boot 3 REST API для мультиязычного интернет-магазина пряжи и текстиля **Bumbac.md**.
+Java 17 + Spring Boot 3 REST API для мультиязычного интернет-магазина пряжи **Bumbac.md**
 
 ![Java](https://img.shields.io/badge/Java-17%2B-informational?logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.x-brightgreen?logo=spring-boot)
@@ -10,140 +10,141 @@ Java 17 + Spring Boot 3 REST API для мультиязычного интер�
 
 ## 🚀 Возможности
 
-| Блок | Что есть |
-|------|----------|
-| Каталог | товары, категории, цвет, тех. характеристики, мультиязык (ru/ro/en) |
-| Поиск/фильтры | цвет, цена, категория, язык |
-| Пользователи | регистрация, вход, JWT, проверка email |
-| Роли | `USER`, `ADMIN`, `CONTENT_MANAGER` |
-| Заказы | проверка остатков, блокировка, фиксация цены |
-| Почта | Mailtrap / SMTP (warehouse email) |
-| Избранное | добавить/убрать товар в `favorites` |
-| Аватар & загрузка файлов | /api/upload |
-| Swagger UI | `/swagger-ui.html` |
-| Actuator | `/actuator/health`, `/actuator/info` |
+| Модуль | Возможности |
+|--------|-------------|
+| Каталог | Ярн, Цвета, Категории, Мультиязычные переводы |
+| Пользователь | Регистрация, Вход, JWT, Роли `USER`, `ADMIN`, `CONTENT_MANAGER` |
+| Корзина | Добавление/удаление товаров, автоматическая инициализация |
+| Заказы | Фиксация цены, Создание заказа, Статусы, История |
+| Возвраты | Частичный возврат с указанием причины, количества, цвета |
+| Избранное | Добавление/удаление любимых товаров |
+| Почта | Поддержка SMTP через Mailtrap/Brevo |
+| Загрузка файлов | Поддержка аватаров и других ресурсов |
+| Документация | Swagger UI + Actuator Endpoints |
 
 ---
 
 ## 🧰 Технологии
 
-* **Java 17**, Maven Wrapper  
-* **Spring Boot 3.2**: Web, Data JPA, Security, Validation, Mail, Actuator  
-* **MySQL 8** (можно PostgreSQL другим профилем)  
-* **JWT** (`jjwt 0.12.5`)  
-* **Lombok 1.18.32**  
-* **Springdoc OpenAPI 2.3** (Swagger UI)
+- Java 17, Spring Boot 3.2.x
+- Maven Wrapper (`./mvnw`)
+- Spring Data JPA (Hibernate)
+- Spring Security + JWT (`jjwt`)
+- MySQL 8 (с поддержкой PostgreSQL)
+- Lombok, Spring Validation
+- Swagger/OpenAPI (`springdoc-openapi`)
+- SMTP (Mailtrap или Brevo)
+- Docker-готовность
 
 ---
 
-## 🛠 Запуск проекта
+## ⚙️ Запуск
 
-### 1 — Клонировать
+### 1 — Клонировать репозиторий
 
 ```bash
 git clone https://github.com/yourname/bumbac-backend.git
 cd bumbac-backend
 ```
 
-### 2 — Создать базу MySQL
+### 2 — Создать базу данных
 
 ```sql
-CREATE DATABASE bumbac_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'bumbac_user'@'localhost' IDENTIFIED BY 'secret';
-GRANT ALL PRIVILEGES ON bumbac_db.* TO 'bumbac_user'@'localhost';
+CREATE DATABASE yarn_store CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON yarn_store.* TO 'bumbac_user'@'localhost' IDENTIFIED BY 'secret';
 ```
 
-### 3 — Переменные окружения
+### 3 — Настроить `.env`
 
-```bash
-# БД
-export DB_HOST=localhost
-export DB_NAME=bumbac_db
-export DB_USER=bumbac_user
-export DB_PASSWORD=secret
+```env
+DB_HOST=localhost
+DB_NAME=yarn_store
+DB_USER=bumbac_user
+DB_PASSWORD=secret
 
-# JWT
-export JWT_SECRET="ChangeMeSuperSecretKeyWith32CharsMinimum"
-
-# Email (Mailtrap пример)
-export SMTP_HOST=smtp.mailtrap.io
-export SMTP_PORT=587
-export SMTP_USER=<mailtrap_user>
-export SMTP_PASS=<mailtrap_pass>
-export WAREHOUSE_EMAIL=orders@bumbac.md
+JWT_SECRET=SomeSuperSecret32CharsString
+SMTP_HOST=smtp.mailtrap.io
+SMTP_PORT=587
+SMTP_USER=your-user
+SMTP_PASS=your-pass
+WAREHOUSE_EMAIL=orders@bumbac.md
 ```
 
 ### 4 — Собрать и запустить
 
 ```bash
-./mvnw clean package
-./mvnw spring-boot:run        # профиль mysql активируется автоматически
+./mvnw clean install
+./mvnw spring-boot:run
 ```
-
-> Другие профили:  
-> `spring-boot:run -Dspring-boot.run.profiles=mysql,mail`  
-> `spring-boot:run -Dspring-boot.run.profiles=postgres`
 
 ---
 
 ## 📚 API Документация
 
-| URL | Описание |
-|-----|----------|
-| `http://localhost:8080/swagger-ui.html` | Swagger UI |
-| `http://localhost:8080/v3/api-docs` | OpenAPI JSON |
-| `http://localhost:8080/actuator/health` | Health-check |
+| URL | Назначение |
+|-----|------------|
+| `/swagger-ui.html` | Swagger UI |
+| `/v3/api-docs` | OpenAPI JSON |
+| `/actuator/health` | Health-check |
 
 ---
 
-## 🔑 Примеры запросов
+## 🧾 Примеры запросов
 
-### Аутентификация
+### 🔐 Регистрация и вход
 
 ```http
 POST /api/auth/register
 {
   "email": "user@mail.com",
-  "password": "123456",
-  "fullName": "Demo User"
+  "password": "12345678"
 }
 
 POST /api/auth/login
 {
   "email": "user@mail.com",
-  "password": "123456"
+  "password": "12345678"
 }
-→ 200 OK
-Authorization: Bearer <jwt>
+→ Bearer Token
 ```
 
-### Товары
+### 🛍 Корзина
 
 ```http
-GET /api/products?lang=ro
-GET /api/products/filter?color=Red
-GET /api/products/42
+POST /api/cart
+Authorization: Bearer <jwt>
+{
+  "yarnId": 12,
+  "quantity": 3
+}
+
+GET /api/cart
+DELETE /api/cart/clear
 ```
 
-### Заказ
+### 📦 Заказ
 
 ```http
 POST /api/orders
 Authorization: Bearer <jwt>
+→ Текущий состав корзины будет зафиксирован как заказ
+```
+
+### ↩️ Возврат
+
+```http
+POST /api/returns
+Authorization: Bearer <jwt>
 {
+  "orderId": 1,
+  "refundAmountCzk": 120.50,
   "items": [
-    { "product": { "id": 42 }, "quantity": 3 }
-  ],
-  "recipientName": "Ion Popescu",
-  "contactPerson": "Ion P.",
-  "phoneNumber": "+37360000000",
-  "email": "ion@example.com",
-  "country": "MD",
-  "region": "Chișinău",
-  "city": "Chișinău",
-  "street": "Str. Decebal",
-  "buildingNumber": "23/1",
-  "postalCode": "MD-2038"
+    {
+      "colorId": 4,
+      "quantity": 2,
+      "reason": "Неправильный цвет"
+    }
+  ]
 }
 ```
 
@@ -152,30 +153,20 @@ Authorization: Bearer <jwt>
 ## 📁 Структура проекта
 
 ```
-.
-├── pom.xml                 # зависимости Maven
-├── mvnw*                   # Maven Wrapper (Win/Linux)
-├── src
-│   ├── main
-│   │   ├── java/md/bumbac/api
-│   │   │   ├── BumbacApplication.java
-│   │   │   ├── config/           # SecurityConfig
-│   │   │   ├── controller/       # REST-эндпойнты
-│   │   │   ├── dto/              # запрос/ответ
-│   │   │   ├── model/            # JPA-сущности
-│   │   │   ├── repository/       # Spring Data
-│   │   │   ├── security/         # JWT-фильтр
-│   │   │   ├── service/          # бизнес-логика
-│   │   │   └── util/             # TranslationUtil
-│   │   └── resources
-│   │       ├── application.yml
-│   │       ├── application-mysql.yml
-│   │       ├── application-mail.yml
-│   │       ├── i18n/
-│   │       ├── static/mock/
-│   │       └── templates/
-│   └── test/java/md/bumbac/api
-└── .mvn/wrapper
+src/
+├── main/
+│   ├── java/com/bumbac/
+│   │   ├── auth/            # регистрация, вход, JWT
+│   │   ├── cart/            # корзина
+│   │   ├── catalog/         # yarn, color, категория
+│   │   ├── order/           # заказы, возвраты
+│   │   ├── user/            # профиль, роли
+│   │   ├── common/          # конфигурации, утилиты
+│   └── resources/
+│       ├── application.yml
+│       ├── i18n/messages_ru.properties
+│       ├── templates/email.html
+└── test/
 ```
 
 ---
@@ -183,23 +174,21 @@ Authorization: Bearer <jwt>
 ## 🧪 Тесты
 
 ```bash
-./mvnw test      # JUnit 5
+./mvnw test
 ```
 
 ---
 
-## 🐳 Запуск в Docker
+## 🐳 Docker
 
 ```bash
 docker build -t bumbac-backend .
 docker run --env-file .env -p 8080:8080 bumbac-backend
 ```
 
-`healthcheck` смотрит `/actuator/health`.
-
 ---
 
 ## 📬 Контакты
 
-Проект для **[Bumbac.md](https://bumbac.md)**  
-Вопросы → issues / pull-requests / email.
+Проект разрабатывается для сайта [https://bumbac.md](https://bumbac.md)  
+Если нашли баг или хотите помочь — welcome в issues и pull requests!
