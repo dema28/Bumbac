@@ -4,6 +4,7 @@ import com.bumbac.order.dto.CreatePaymentRequest;
 import com.bumbac.order.dto.PaymentDTO;
 import com.bumbac.order.entity.Payment;
 import com.bumbac.order.entity.PaymentStatus;
+import com.bumbac.order.entity.Return;
 import com.bumbac.order.mapper.PaymentMapper;
 import com.bumbac.order.repository.PaymentRepository;
 import com.bumbac.order.repository.PaymentStatusRepository;
@@ -48,4 +49,20 @@ public class PaymentService {
 
         return paymentMapper.toDto(paymentRepository.save(payment));
     }
+    public PaymentDTO processRefund(Return ret) {
+        PaymentStatus refundedStatus = paymentStatusRepository
+                .findByCode("REFUNDED")
+                .orElseThrow(() -> new RuntimeException("Missing REFUNDED status"));
+
+        Payment refund = Payment.builder()
+                .orderId(ret.getOrderId())
+                .amountCzk(ret.getRefundAmountCzk())
+                .status(refundedStatus)
+                .provider("REFUND")
+                .paidAt(LocalDateTime.now())
+                .build();
+
+        return paymentMapper.toDto(paymentRepository.save(refund));
+    }
+
 }

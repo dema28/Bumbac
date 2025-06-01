@@ -4,7 +4,11 @@ import com.bumbac.order.dto.ReturnDTO;
 import com.bumbac.order.dto.ReturnRequestDTO;
 import com.bumbac.order.service.ReturnService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 
 import java.util.List;
 
@@ -21,7 +25,17 @@ public class ReturnController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ReturnDTO createReturn(@RequestBody ReturnRequestDTO dto) {
-        return returnService.createReturnDTO(dto);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = auth.getName();
+        return returnService.createReturnDTO(dto, userEmail);
     }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ReturnDTO getReturnById(@PathVariable Long id) {
+        return returnService.getReturnById(id);
+    }
+
 }

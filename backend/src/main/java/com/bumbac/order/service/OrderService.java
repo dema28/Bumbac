@@ -5,12 +5,17 @@ import com.bumbac.cart.entity.Cart;
 import com.bumbac.cart.entity.CartItem;
 import com.bumbac.cart.repository.CartItemRepository;
 import com.bumbac.cart.repository.CartRepository;
+import com.bumbac.order.dto.ReturnDTO;
 import com.bumbac.order.entity.Order;
 import com.bumbac.order.entity.OrderItem;
+import com.bumbac.order.entity.Return;
 import com.bumbac.order.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.bumbac.order.repository.ReturnRepository;
+import com.bumbac.order.mapper.ReturnMapper;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +29,10 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+
+    private final ReturnRepository returnRepository;
+    private final ReturnMapper returnMapper;
+
 
     @Transactional
     public void placeOrder(User user) {
@@ -67,4 +76,10 @@ public class OrderService {
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
+    public ReturnDTO getReturnById(Long id) {
+        Return ret = returnRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Return not found"));
+        return returnMapper.toDto(ret);
+    }
+
 }
