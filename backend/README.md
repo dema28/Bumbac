@@ -27,7 +27,7 @@ Java 17 + Spring Boot 3 REST API для мультиязычного интер�
 ## 🧰 Технологии
 
 - Java 17, Spring Boot 3.2.x
-- Maven Wrapper (`./mvnw`)
+- Maven (`mvn`)
 - Spring Data JPA (Hibernate)
 - Spring Security + JWT (`jjwt`)
 - MySQL 8 (с поддержкой PostgreSQL)
@@ -73,8 +73,8 @@ WAREHOUSE_EMAIL=orders@bumbac.md
 ### 4 — Собрать и запустить
 
 ```bash
-./mvnw clean install
-./mvnw spring-boot:run
+mvn clean install
+mvn spring-boot:run
 ```
 
 ---
@@ -174,7 +174,7 @@ src/
 ## 🧪 Тесты
 
 ```bash
-./mvnw test
+mvn test
 ```
 
 ---
