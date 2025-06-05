@@ -70,6 +70,7 @@ public class NewsletterService {
         return newsletterRepository.findByConfirmationToken(token).map(subscriber -> {
             subscriber.setConfirmed(true);
             subscriber.setConfirmationToken(null);
+            newsletterRepository.save(subscriber);
             return true;
         }).orElse(false);
     }
@@ -78,6 +79,7 @@ public class NewsletterService {
     public boolean unsubscribe(NewsletterUnsubscribeRequest request) {
         return newsletterRepository.findByEmail(request.getEmail()).map(subscriber -> {
             subscriber.setUnsubscribed(true);
+            newsletterRepository.save(subscriber);
             return true;
         }).orElse(false);
     }
