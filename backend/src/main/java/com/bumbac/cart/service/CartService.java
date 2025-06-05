@@ -43,13 +43,18 @@ public class CartService {
 
         CartItemId id = new CartItemId(cart.getId(), color.getId());
 
-        CartItem item = CartItem.builder()
-                .id(id)
-                .cart(cart)
-                .color(color)
-                .quantity(dto.getQuantity())
-                .addedAt(LocalDateTime.now())
-                .build();
+        CartItem item = cartItemRepository.findById(id)
+                .map(existing -> {
+                    existing.setQuantity(existing.getQuantity() + dto.getQuantity());
+                    return existing;
+                })
+                .orElseGet(() -> CartItem.builder()
+                        .id(id)
+                        .cart(cart)
+                        .color(color)
+                        .quantity(dto.getQuantity())
+                        .addedAt(LocalDateTime.now())
+                        .build());
 
         cartItemRepository.save(item);
     }
