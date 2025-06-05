@@ -1,4 +1,4 @@
-# 🧵 Bumbac.md — Backend
+# 🧵 Bumbac — Backend
 
 Java 17 + Spring Boot 3 REST API для мультиязычного интернет-магазина пряжи **Bumbac.md**
 
