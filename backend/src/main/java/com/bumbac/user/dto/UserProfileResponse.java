@@ -1,11 +1,13 @@
 package com.bumbac.user.dto;
 
 import com.bumbac.auth.entity.Role;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class UserProfileResponse {
     private Long id;
     private String email;

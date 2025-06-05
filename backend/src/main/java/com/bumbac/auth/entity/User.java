@@ -1,5 +1,6 @@
 package com.bumbac.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,10 +9,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -33,6 +35,7 @@ public class User {
 
     private LocalDateTime createdAt;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserFavorite> favorites;
 }

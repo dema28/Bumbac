@@ -23,9 +23,20 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/profile")
-    public ResponseEntity<User> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(userService.getCurrentUser(userDetails.getUsername()));
+    public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.getCurrentUser(userDetails.getUsername());
+        var dto = new UserProfileResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getRole(),          // ← добавь это!
+                user.getFirstName(),
+                user.getLastName(),
+                user.getPhone()
+        );
+        return ResponseEntity.ok(dto);
     }
+
+
 
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetails userDetails,

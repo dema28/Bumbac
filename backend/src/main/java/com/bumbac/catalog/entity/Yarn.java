@@ -2,6 +2,7 @@ package com.bumbac.catalog.entity;
 
 import com.bumbac.auth.entity.UserFavorite;
 import com.bumbac.cart.entity.Color;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,10 +11,12 @@ import java.util.List;
 
 @Entity
 @Table(name = "yarns")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+
 public class Yarn {
 
     @Id
@@ -31,6 +34,7 @@ public class Yarn {
 
     private LocalDateTime createdAt;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserFavorite> favorites;
 

@@ -27,9 +27,18 @@ public class JwtAuthenticationFilter extends GenericFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var user = userRepository.findByEmail(email);
             if (user.isPresent()) {
-                var authToken = new UsernamePasswordAuthenticationToken(
-                        user.get(), null, null
+                var userEntity = user.get();
+
+                var userDetails = new org.springframework.security.core.userdetails.User(
+                        userEntity.getEmail(),
+                        userEntity.getPasswordHash(),
+                        java.util.List.of()
                 );
+
+                var authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(http));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
