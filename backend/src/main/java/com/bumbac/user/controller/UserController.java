@@ -20,66 +20,62 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    @GetMapping("/profile")
-    public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.getCurrentUser(userDetails.getUsername());
-        var dto = new UserProfileResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getRole(),          // ← добавь это!
-                user.getFirstName(),
-                user.getLastName(),
-                user.getPhone()
-        );
-        return ResponseEntity.ok(dto);
-    }
+  @GetMapping("/profile")
+  public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal UserDetails userDetails) {
+    User user = userService.getCurrentUser(userDetails.getUsername());
+    var dto = new UserProfileResponse(
+        user.getId(),
+        user.getEmail(),
+        user.getRoleCodes(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getPhone());
+    return ResponseEntity.ok(dto);
+  }
 
+  @PutMapping("/profile")
+  public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetails userDetails,
+      @RequestBody UpdateUserDto dto) {
+    userService.updateUserProfile(userDetails.getUsername(), dto);
+    return ResponseEntity.ok("Profile updated");
+  }
 
+  @PutMapping("/password")
+  public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
+      @RequestParam String newPassword) {
+    userService.changePassword(userDetails.getUsername(), newPassword);
+    return ResponseEntity.ok("Password updated");
+  }
 
-    @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetails userDetails,
-                                           @RequestBody UpdateUserDto dto) {
-        userService.updateUserProfile(userDetails.getUsername(), dto);
-        return ResponseEntity.ok("Profile updated");
-    }
+  @GetMapping("/me")
+  public ResponseEntity<?> getCurrentUserShort(@AuthenticationPrincipal UserDetails userDetails) {
+    return ResponseEntity.ok(userDetails.getUsername());
+  }
 
-    @PutMapping("/password")
-    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                            @RequestParam String newPassword) {
-        userService.changePassword(userDetails.getUsername(), newPassword);
-        return ResponseEntity.ok("Password updated");
-    }
+  @GetMapping("/me/full")
+  public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest request) {
+    return ResponseEntity.ok(userService.getProfile(request));
+  }
 
-    @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUserShort(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(userDetails.getUsername());
-    }
+  @PutMapping("/me/full")
+  public ResponseEntity<UserProfileResponse> updateProfile(
+      HttpServletRequest request,
+      @RequestBody UserProfileRequest updateRequest) {
+    return ResponseEntity.ok(userService.updateProfile(request, updateRequest));
+  }
 
-    @GetMapping("/me/full")
-    public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest request) {
-        return ResponseEntity.ok(userService.getProfile(request));
-    }
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/admin/all")
+  public ResponseEntity<List<UserProfileResponse>> getAllUsers() {
+    return ResponseEntity.ok(userService.getAll());
+  }
 
-    @PutMapping("/me/full")
-    public ResponseEntity<UserProfileResponse> updateProfile(
-            HttpServletRequest request,
-            @RequestBody UserProfileRequest updateRequest
-    ) {
-        return ResponseEntity.ok(userService.updateProfile(request, updateRequest));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/all")
-    public ResponseEntity<List<UserProfileResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAll());
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/admin/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
+  @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/admin/{id}")
+  public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    userService.deleteById(id);
+    return ResponseEntity.noContent().build();
+  }
 }

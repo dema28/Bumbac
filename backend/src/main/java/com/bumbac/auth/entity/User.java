@@ -18,34 +18,32 @@ import java.util.Set;
 @Builder
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+  @Column(nullable = false, unique = true)
+  private String email;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+  @Column(name = "password_hash", nullable = false)
+  private String passwordHash;
 
-    private String firstName;
-    private String lastName;
-    private String phone;
+  private String firstName;
+  private String lastName;
+  private String phone;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+  private LocalDateTime createdAt;
 
-    private LocalDateTime createdAt;
+  @JsonBackReference
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<UserFavorite> favorites;
 
-    @JsonBackReference
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserFavorite> favorites;
+  @JsonManagedReference
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+  private Set<Role> roles;
 
-    @JsonManagedReference
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
-
+  public List<String> getRoleCodes() {
+    return roles == null ? List.of() : roles.stream().map(Role::getCode).toList();
+  }
 }

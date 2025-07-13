@@ -22,93 +22,118 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class YarnServiceTest {
 
-    @Mock
-    private YarnRepository yarnRepository;
+  @Mock
+  private YarnRepository yarnRepository;
 
-    private final YarnMapper yarnMapper = new YarnMapper();
+  @Mock
+  private YarnMapper yarnMapper;
 
-    @InjectMocks
-    private YarnService yarnService;
+  @InjectMocks
+  private YarnService yarnService;
 
-    private Yarn sampleYarn(String category, String brand, String material) {
-        return Yarn.builder()
-                .id(1L)
-                .name("test")
-                .category(category)
-                .brand(brand)
-                .material(material)
-                .weight(50.0)
-                .length(100.0)
-                .priceMDL(10.0)
-                .priceUSD(5.0)
-                .build();
+  private Yarn sampleYarn(String category, String brand, String material) {
+    return Yarn.builder()
+        .id(1L)
+        .name("test")
+        .category(category)
+        .brand(brand)
+        .material(material)
+        .weight(50.0)
+        .length(100.0)
+        .priceMDL(10.0)
+        .priceUSD(5.0)
+        .build();
+  }
+
+  @Test
+  void filterByCategoryDelegatesToSpecification() {
+    String category = "cat";
+    Yarn yarn = sampleYarn(category, "brand", "mat");
+    when(yarnRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
+        .thenReturn(List.of(yarn));
+    when(yarnMapper.toResponse(any(Yarn.class))).thenReturn(
+        YarnResponse.builder()
+            .id(yarn.getId())
+            .category(yarn.getCategory())
+            .brand(yarn.getBrand())
+            .material(yarn.getMaterial())
+            .build());
+
+    try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
+      Specification<Yarn> spec = mock(Specification.class);
+      specMock.when(() -> YarnSpecification.hasCategory(category)).thenReturn(spec);
+
+      List<YarnResponse> result = yarnService.filter(category, null, null);
+
+      specMock.verify(() -> YarnSpecification.hasCategory(category));
+      specMock.verifyNoMoreInteractions();
+      verify(yarnRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class));
+      assertEquals(1, result.size());
+      YarnResponse resp = result.get(0);
+      assertEquals(yarn.getId(), resp.getId());
+      assertEquals(yarn.getCategory(), resp.getCategory());
+      assertEquals(yarn.getBrand(), resp.getBrand());
+      assertEquals(yarn.getMaterial(), resp.getMaterial());
     }
+  }
 
-    @Test
-    void filterByCategoryDelegatesToSpecification() {
-        String category = "cat";
-        Yarn yarn = sampleYarn(category, "brand", "mat");
-        when(yarnRepository.findAll(any())).thenReturn(List.of(yarn));
+  @Test
+  void filterByBrandDelegatesToSpecification() {
+    String brand = "brand";
+    Yarn yarn = sampleYarn("cat", brand, "mat");
+    when(yarnRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
+        .thenReturn(List.of(yarn));
+    when(yarnMapper.toResponse(any(Yarn.class))).thenReturn(
+        YarnResponse.builder()
+            .id(yarn.getId())
+            .category(yarn.getCategory())
+            .brand(yarn.getBrand())
+            .material(yarn.getMaterial())
+            .build());
 
-        try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
-            Specification<Yarn> spec = mock(Specification.class);
-            specMock.when(() -> YarnSpecification.hasCategory(category)).thenReturn(spec);
+    try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
+      Specification<Yarn> spec = mock(Specification.class);
+      specMock.when(() -> YarnSpecification.hasBrand(brand)).thenReturn(spec);
 
-            List<YarnResponse> result = yarnService.filter(category, null, null);
+      List<YarnResponse> result = yarnService.filter(null, brand, null);
 
-            specMock.verify(() -> YarnSpecification.hasCategory(category));
-            specMock.verifyNoMoreInteractions();
-            verify(yarnRepository).findAll(any());
-            assertEquals(1, result.size());
-            YarnResponse resp = result.get(0);
-            assertEquals(yarn.getId(), resp.getId());
-            assertEquals(yarn.getCategory(), resp.getCategory());
-            assertEquals(yarn.getBrand(), resp.getBrand());
-            assertEquals(yarn.getMaterial(), resp.getMaterial());
-        }
+      specMock.verify(() -> YarnSpecification.hasBrand(brand));
+      specMock.verifyNoMoreInteractions();
+      verify(yarnRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class));
+      assertEquals(1, result.size());
+      YarnResponse resp = result.get(0);
+      assertEquals(yarn.getId(), resp.getId());
+      assertEquals(yarn.getBrand(), resp.getBrand());
     }
+  }
 
-    @Test
-    void filterByBrandDelegatesToSpecification() {
-        String brand = "brand";
-        Yarn yarn = sampleYarn("cat", brand, "mat");
-        when(yarnRepository.findAll(any())).thenReturn(List.of(yarn));
+  @Test
+  void filterByMaterialDelegatesToSpecification() {
+    String material = "mat";
+    Yarn yarn = sampleYarn("cat", "brand", material);
+    when(yarnRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
+        .thenReturn(List.of(yarn));
+    when(yarnMapper.toResponse(any(Yarn.class))).thenReturn(
+        YarnResponse.builder()
+            .id(yarn.getId())
+            .category(yarn.getCategory())
+            .brand(yarn.getBrand())
+            .material(yarn.getMaterial())
+            .build());
 
-        try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
-            Specification<Yarn> spec = mock(Specification.class);
-            specMock.when(() -> YarnSpecification.hasBrand(brand)).thenReturn(spec);
+    try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
+      Specification<Yarn> spec = mock(Specification.class);
+      specMock.when(() -> YarnSpecification.hasMaterial(material)).thenReturn(spec);
 
-            List<YarnResponse> result = yarnService.filter(null, brand, null);
+      List<YarnResponse> result = yarnService.filter(null, null, material);
 
-            specMock.verify(() -> YarnSpecification.hasBrand(brand));
-            specMock.verifyNoMoreInteractions();
-            verify(yarnRepository).findAll(any());
-            assertEquals(1, result.size());
-            YarnResponse resp = result.get(0);
-            assertEquals(yarn.getId(), resp.getId());
-            assertEquals(yarn.getBrand(), resp.getBrand());
-        }
+      specMock.verify(() -> YarnSpecification.hasMaterial(material));
+      specMock.verifyNoMoreInteractions();
+      verify(yarnRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class));
+      assertEquals(1, result.size());
+      YarnResponse resp = result.get(0);
+      assertEquals(yarn.getId(), resp.getId());
+      assertEquals(yarn.getMaterial(), resp.getMaterial());
     }
-
-    @Test
-    void filterByMaterialDelegatesToSpecification() {
-        String material = "mat";
-        Yarn yarn = sampleYarn("cat", "brand", material);
-        when(yarnRepository.findAll(any())).thenReturn(List.of(yarn));
-
-        try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
-            Specification<Yarn> spec = mock(Specification.class);
-            specMock.when(() -> YarnSpecification.hasMaterial(material)).thenReturn(spec);
-
-            List<YarnResponse> result = yarnService.filter(null, null, material);
-
-            specMock.verify(() -> YarnSpecification.hasMaterial(material));
-            specMock.verifyNoMoreInteractions();
-            verify(yarnRepository).findAll(any());
-            assertEquals(1, result.size());
-            YarnResponse resp = result.get(0);
-            assertEquals(yarn.getId(), resp.getId());
-            assertEquals(yarn.getMaterial(), resp.getMaterial());
-        }
-    }
+  }
 }

@@ -1,17 +1,28 @@
 package com.bumbac.auth.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.Set;
 
-public enum Role {
-    USER,
-    ADMIN,
-    CONTENT_MANAGER;
+@Entity
+@Table(name = "roles")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Role {
 
-    @JsonBackReference
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String code; // Пример: "USER", "ADMIN", "CONTENT_MANAGER"
+
+    private String name; // Пример: "Пользователь", "Администратор"
+
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
-
-    }
+}

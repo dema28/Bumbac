@@ -3,6 +3,7 @@ package com.bumbac.auth.service;
 import com.bumbac.auth.dto.*;
 import com.bumbac.auth.entity.Role;
 import com.bumbac.auth.entity.User;
+import com.bumbac.auth.repository.RoleRepository;
 import com.bumbac.auth.repository.UserRepository;
 import com.bumbac.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -11,46 +12,49 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final AuthenticationManager authManager;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
+  private final AuthenticationManager authManager;
+  private final RoleRepository roleRepository;
 
-    public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already in use");
-        }
-
-        User user = User.builder()
-                .email(request.getEmail())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .phone(request.getPhone())
-                .role(Role.USER)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        userRepository.save(user);
-
-        String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse(token);
+  public AuthResponse register(RegisterRequest request) {
+    if (userRepository.existsByEmail(request.getEmail())) {
+      throw new RuntimeException("Email already in use");
     }
 
-    public AuthResponse login(LoginRequest request) {
-        authManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getEmail(), request.getPassword()
-        ));
+    Role userRole = roleRepository.findByCode("USER")
+        .orElseThrow(() -> new RuntimeException("Role USER not found"));
+    User user = User.builder()
+        .email(request.getEmail())
+        .passwordHash(passwordEncoder.encode(request.getPassword()))
+        .firstName(request.getFirstName())
+        .lastName(request.getLastName())
+        .phone(request.getPhone())
+        .roles(Set.of(userRole))
+        .createdAt(LocalDateTime.now())
+        .build();
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    userRepository.save(user);
 
-        String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse(token);
-    }
+    String token = jwtService.generateToken(user.getEmail());
+    return new AuthResponse(token);
+  }
+
+  public AuthResponse login(LoginRequest request) {
+    authManager.authenticate(new UsernamePasswordAuthenticationToken(
+        request.getEmail(), request.getPassword()));
+
+    User user = userRepository.findByEmail(request.getEmail())
+        .orElseThrow(() -> new RuntimeException("User not found"));
+
+    String token = jwtService.generateToken(user.getEmail());
+    return new AuthResponse(token);
+  }
 }

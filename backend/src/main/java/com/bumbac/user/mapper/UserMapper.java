@@ -8,20 +8,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
 
-    public UserProfileResponse toDto(User user) {
-        return UserProfileResponse.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .phone(user.getPhone())
-                .build();
-    }
+  public UserProfileResponse toDto(User user) {
+    return UserProfileResponse.builder()
+        .id(user.getId())
+        .email(user.getEmail())
+        .roles(user.getRoleCodes())
+        .firstName(user.getFirstName())
+        .lastName(user.getLastName())
+        .phone(user.getPhone())
+        .build();
+  }
 
-    public void update(User user, UserProfileRequest request) {
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPhone(request.getPhone());
-    }
+  public void update(User user, UserProfileRequest request) {
+    user.setFirstName(request.getFirstName());
+    user.setLastName(request.getLastName());
+    user.setPhone(request.getPhone());
+  }
 }
