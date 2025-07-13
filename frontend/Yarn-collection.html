@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 
 <html lang="ru">
-<head><script src="https://cdn.tailwindcss.com/3.4.16"></script><script>tailwind.config = { theme: { extend: { colors: { primary: '#d4b98c', secondary: '#f8f5f0' }, borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' } } } }</script><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Poppins:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet"/><style>
+
+<head>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>tailwind.config = { theme: { extend: { colors: { primary: '#d4b98c', secondary: '#f8f5f0' }, borderRadius: { 'none': '0px', 'sm': '4px', DEFAULT: '8px', 'md': '12px', 'lg': '16px', 'xl': '20px', '2xl': '24px', '3xl': '32px', 'full': '9999px', 'button': '8px' } } } }</script>
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Poppins:wght@300;400;500;600&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+  <style>
     :where([class^="ri-"])::before {
       content: "\f3c2";
     }
@@ -55,112 +66,121 @@
     .active::after {
       width: 100%;
     }
-  </style><link href="css/tailwind.css" rel="stylesheet"/>
-<link href="css/fonts.css" rel="stylesheet"/>
-<link href="css/remixicon.css" rel="stylesheet"/>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Yarn | Коллекция пряжи пряжи</title>
+  </style>
+  <link href="css/tailwind.css" rel="stylesheet" />
+  <link href="css/fonts.css" rel="stylesheet" />
+  <link href="css/remixicon.css" rel="stylesheet" />
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Yarn | Коллекция пряжи пряжи</title>
 </head>
+
 <body class="bg-secondary text-gray-900 font-sans">
-<!-- Header (тот же, как в index.html) -->
-<header class="fixed top-0 left-0 right-0 bg-white shadow z-50">
-<div class="container mx-auto px-6 py-4 flex justify-between items-center">
-<a class="font-[Pacifico] text-3xl text-primary" href="index.html">Yarn</a>
-<nav class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
-    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-      <a href="index.html" class="font-['Pacifico'] text-3xl text-primary">Yarn</a>
-      <div class="hidden md:flex items-center space-x-8">
-        <a href="/index.html" class="nav-link text-gray-800 hover:text-primary transition">Главная</a>
-        <a href="/Yarn-collection.html" class="nav-link active text-gray-800 hover:text-primary transition">Пряжа</a>
-        <a href="/New-season.html" class="nav-link text-gray-800 hover:text-primary transition">Новый сезон</a>
-        <a href="/Patterns.html" class="nav-link text-gray-800 hover:text-primary transition">Паттерны</a>
-        <a href="/Puffy.html" class="nav-link text-gray-800 hover:text-primary transition">Двухсторонняя</a>
-        <a href="/Videos.html" class="nav-link text-gray-800 hover:text-primary transition">Видео</a>
-        <a href="Brochure.html" class="nav-link text-gray-800 hover:text-primary transition">Брошюры</a>
-        <a href="/About.html" class="nav-link text-gray-800 hover:text-primary transition">О нас</a>
-        <a href="/Contact.html" class="nav-link text-gray-800 hover:text-primary transition">Контакты</a>
-      </div>
+  <!-- Header (тот же, как в index.html) -->
+  <header class="fixed top-0 left-0 right-0 bg-white shadow z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <a class="font-[Pacifico] text-3xl text-primary" href="index.html">Yarn</a>
+      <nav class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+          <a href="index.html" class="font-['Pacifico'] text-3xl text-primary">Yarn</a>
+          <div class="hidden md:flex items-center space-x-8">
+            <a href="/index.html" class="nav-link text-gray-800 hover:text-primary transition">Главная</a>
+            <a href="/Yarn-collection.html"
+              class="nav-link active text-gray-800 hover:text-primary transition">Пряжа</a>
+            <a href="/New-season.html" class="nav-link text-gray-800 hover:text-primary transition">Новый сезон</a>
+            <a href="/Patterns.html" class="nav-link text-gray-800 hover:text-primary transition">Паттерны</a>
+            <a href="/Puffy.html" class="nav-link text-gray-800 hover:text-primary transition">Двухсторонняя</a>
+            <a href="/Videos.html" class="nav-link text-gray-800 hover:text-primary transition">Видео</a>
+            <a href="Brochure.html" class="nav-link text-gray-800 hover:text-primary transition">Брошюры</a>
+            <a href="/About.html" class="nav-link text-gray-800 hover:text-primary transition">О нас</a>
+            <a href="/Contact.html" class="nav-link text-gray-800 hover:text-primary transition">Контакты</a>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
+              <i class="ri-search-line ri-lg"></i>
+            </button>
+            <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
+              <i class="ri-shopping-bag-line ri-lg"></i>
+            </button>
+            <button class="md:hidden w-10 h-10 flex items-center justify-center text-gray-700">
+              <i class="ri-menu-line ri-lg"></i>
+            </button>
+            <!-- Profile Button with Dropdown -->
+            <div class="relative" id="profile-dropdown">
+              <button id="profile-btn"
+                class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
+                <i class="ri-user-line ri-lg"></i>
+              </button>
+              <div id="dropdown-menu"
+                class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50 p-1">
+                <a href="Login.html"
+                  class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Вход</a>
+                <a href="Register.html"
+                  class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Регистрация</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
       <div class="flex items-center space-x-4">
-        <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
+        <button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-primary">
           <i class="ri-search-line ri-lg"></i>
         </button>
-        <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
-          <i class="ri-shopping-bag-line ri-lg"></i>
-        </button>
-        <button class="md:hidden w-10 h-10 flex items-center justify-center text-gray-700">
-          <i class="ri-menu-line ri-lg"></i>
-        </button>
-        <!-- Profile Button with Dropdown -->
         <div class="relative" id="profile-dropdown">
-          <button id="profile-btn"
-            class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
+          <button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-primary" id="profile-btn">
             <i class="ri-user-line ri-lg"></i>
           </button>
-          <div id="dropdown-menu"
-            class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50 p-1">
-            <a href="Login.html"
-              class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Вход</a>
-            <a href="Register.html"
-              class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Регистрация</a>
+          <div class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50"
+            id="dropdown-menu">
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="login.html" id="nav-login">Вход</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="register.html"
+              id="nav-register">Регистрация</a>
+            <a class="hidden block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="dashboard.html"
+              id="nav-profile">Профиль</a>
+            <a class="hidden block px-4 py-2 text-sm text-red-600 hover:bg-gray-50" href="#" id="nav-logout">Выйти</a>
           </div>
         </div>
       </div>
     </div>
-  </nav>
-<div class="flex items-center space-x-4">
-<button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-primary">
-<i class="ri-search-line ri-lg"></i>
-</button>
-<div class="relative" id="profile-dropdown">
-<button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-primary" id="profile-btn">
-<i class="ri-user-line ri-lg"></i>
-</button>
-<div class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50" id="dropdown-menu">
-<a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="login.html" id="nav-login">Вход</a>
-<a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="register.html" id="nav-register">Регистрация</a>
-<a class="hidden block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="dashboard.html" id="nav-profile">Профиль</a>
-<a class="hidden block px-4 py-2 text-sm text-red-600 hover:bg-gray-50" href="#" id="nav-logout">Выйти</a>
-</div>
-</div>
-</div>
-</div>
-</header>
-<!-- Content -->
-<main class="pt-32 pb-16">
-<div class="container mx-auto px-6">
-<h1 class="text-3xl font-serif font-semibold text-center text-primary mb-10">Коллекции пряжи Alize</h1>
-<!-- Filter Bar -->
-<div class="flex flex-wrap justify-center gap-4 mb-8">
-<button class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Зима</button>
-<button class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Хлопок</button>
-<button class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Акрил</button>
-<button class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Детская</button>
-</div>
-<!-- Yarn Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-<div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
-<img alt="Classic Wool" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn1.jpg"/>
-<h3 class="text-xl font-medium mb-2">Classic Wool</h3>
-<p class="text-gray-600 text-sm">100% шерсть. Тёплая и мягкая. Идеальна для зимних изделий.</p>
-</div>
-<div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
-<img alt="Cotton Baby" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn2.jpg"/>
-<h3 class="text-xl font-medium mb-2">Cotton Baby</h3>
-<p class="text-gray-600 text-sm">Хлопок для детей. Нежная текстура, гипоаллергенно.</p>
-</div>
-<div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
-<img alt="Angora Lux" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn3.jpg"/>
-<h3 class="text-xl font-medium mb-2">Angora Lux</h3>
-<p class="text-gray-600 text-sm">Смесь ангорки и акрила. Лёгкость и тепло в каждой нити.</p>
-</div>
-</div>
-</div>
-</main>
-<!-- Footer -->
+  </header>
+  <!-- Content -->
+  <main class="pt-32 pb-16">
+    <div class="container mx-auto px-6">
+      <h1 class="text-3xl font-serif font-semibold text-center text-primary mb-10">Коллекции пряжи Alize</h1>
+      <!-- Filter Bar -->
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+        <button class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Зима</button>
+        <button
+          class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Хлопок</button>
+        <button
+          class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Акрил</button>
+        <button
+          class="bg-white px-4 py-2 rounded-button shadow text-sm hover:bg-primary hover:text-white">Детская</button>
+      </div>
+      <!-- Yarn Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
+          <img alt="Classic Wool" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn1.jpg" />
+          <h3 class="text-xl font-medium mb-2">Classic Wool</h3>
+          <p class="text-gray-600 text-sm">100% шерсть. Тёплая и мягкая. Идеальна для зимних изделий.</p>
+        </div>
+        <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
+          <img alt="Cotton Baby" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn2.jpg" />
+          <h3 class="text-xl font-medium mb-2">Cotton Baby</h3>
+          <p class="text-gray-600 text-sm">Хлопок для детей. Нежная текстура, гипоаллергенно.</p>
+        </div>
+        <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
+          <img alt="Angora Lux" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn3.jpg" />
+          <h3 class="text-xl font-medium mb-2">Angora Lux</h3>
+          <p class="text-gray-600 text-sm">Смесь ангорки и акрила. Лёгкость и тепло в каждой нити.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- Footer -->
 
-<!-- Script -->
-<script>
+  <!-- Script -->
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
       // Mobile menu toggle
       const menuButton = document.querySelector('.ri-menu-line').parentElement;
@@ -179,77 +199,85 @@
         navLinks.classList.toggle('shadow-md');
       });
     });
-  </script><script src="js/main.module.js" type="module"></script><footer class="bg-gray-100 pt-16 pb-8">
-<div class="container mx-auto px-6">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-<div>
-<a class="font-['Pacifico'] text-3xl text-primary mb-6 inline-block" href="#">logo</a>
-<p class="text-gray-600 mb-6">Premium yarns for knitting and crochet enthusiasts since 1985.</p>
-<div class="flex space-x-4">
-<a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition" href="#">
-<i class="ri-facebook-fill"></i>
-</a>
-<a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition" href="#">
-<i class="ri-instagram-line"></i>
-</a>
-<a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition" href="#">
-<i class="ri-pinterest-line"></i>
-</a>
-<a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition" href="#">
-<i class="ri-youtube-line"></i>
-</a>
-</div>
-</div>
-<div>
-<h3 class="text-lg font-medium text-gray-900 mb-6">Shop</h3>
-<ul class="space-y-4">
-<li><a class="text-gray-600 hover:text-primary transition" href="#">All Yarns</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">New Arrivals</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Bestsellers</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Special Offers</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Gift Cards</a></li>
-</ul>
-</div>
-<div>
-<h3 class="text-lg font-medium text-gray-900 mb-6">Information</h3>
-<ul class="space-y-4">
-<li><a class="text-gray-600 hover:text-primary transition" href="#">About Us</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Sustainability</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Careers</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Terms &amp; Conditions</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Privacy Policy</a></li>
-</ul>
-</div>
-<div>
-<h3 class="text-lg font-medium text-gray-900 mb-6">Customer Service</h3>
-<ul class="space-y-4">
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Contact Us</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">FAQs</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Shipping &amp; Returns</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Track Order</a></li>
-<li><a class="text-gray-600 hover:text-primary transition" href="#">Care Instructions</a></li>
-</ul>
-</div>
-</div>
-<div class="pt-8 border-t border-gray-200">
-<div class="flex flex-col md:flex-row justify-between items-center">
-<p class="text-gray-500 text-sm mb-4 md:mb-0">© 2025 Alize Yarns. All rights reserved.</p>
-<div class="flex items-center space-x-4">
-<span class="w-10 h-6 flex items-center justify-center text-gray-600">
-<i class="ri-visa-fill ri-lg"></i>
-</span>
-<span class="w-10 h-6 flex items-center justify-center text-gray-600">
-<i class="ri-mastercard-fill ri-lg"></i>
-</span>
-<span class="w-10 h-6 flex items-center justify-center text-gray-600">
-<i class="ri-paypal-fill ri-lg"></i>
-</span>
-<span class="w-10 h-6 flex items-center justify-center text-gray-600">
-<i class="ri-apple-fill ri-lg"></i>
-</span>
-</div>
-</div>
-</div>
-</div>
-</footer></body>
+  </script>
+  <script src="js/main.module.js" type="module"></script>
+  <footer class="bg-gray-100 pt-16 pb-8">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+        <div>
+          <a class="font-['Pacifico'] text-3xl text-primary mb-6 inline-block" href="index.html">Yarn</a>
+          <p class="text-gray-600 mb-6">Premium yarns for knitting and crochet enthusiasts since 1985.</p>
+          <div class="flex space-x-4">
+            <a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition"
+              href="#">
+              <i class="ri-facebook-fill"></i>
+            </a>
+            <a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition"
+              href="#">
+              <i class="ri-instagram-line"></i>
+            </a>
+            <a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition"
+              href="#">
+              <i class="ri-pinterest-line"></i>
+            </a>
+            <a class="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-600 hover:text-primary transition"
+              href="#">
+              <i class="ri-youtube-line"></i>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-6">Shop</h3>
+          <ul class="space-y-4">
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">All Yarns</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">New Arrivals</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Bestsellers</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Special Offers</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Gift Cards</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-6">Information</h3>
+          <ul class="space-y-4">
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">About Us</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Sustainability</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Careers</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Terms &amp; Conditions</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 mb-6">Customer Service</h3>
+          <ul class="space-y-4">
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Contact Us</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">FAQs</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Shipping &amp; Returns</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Track Order</a></li>
+            <li><a class="text-gray-600 hover:text-primary transition" href="#">Care Instructions</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-gray-200">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <p class="text-gray-500 text-sm mb-4 md:mb-0">© 2025 Alize Yarns. All rights reserved.</p>
+          <div class="flex items-center space-x-4">
+            <span class="w-10 h-6 flex items-center justify-center text-gray-600">
+              <i class="ri-visa-fill ri-lg"></i>
+            </span>
+            <span class="w-10 h-6 flex items-center justify-center text-gray-600">
+              <i class="ri-mastercard-fill ri-lg"></i>
+            </span>
+            <span class="w-10 h-6 flex items-center justify-center text-gray-600">
+              <i class="ri-paypal-fill ri-lg"></i>
+            </span>
+            <span class="w-10 h-6 flex items-center justify-center text-gray-600">
+              <i class="ri-apple-fill ri-lg"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
 </html>
