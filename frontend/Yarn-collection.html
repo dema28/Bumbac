@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="ru">
+<html lang="en">
 
 <head>
   <script src="https://cdn.tailwindcss.com/3.4.16"></script>
@@ -72,77 +72,53 @@
   <link href="css/remixicon.css" rel="stylesheet" />
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Yarn | Коллекция пряжи пряжи</title>
+  <title>Yarn | Коллекция пряжи</title>
 </head>
 
 <body class="bg-secondary text-gray-900 font-sans">
-  <!-- Header (тот же, как в index.html) -->
-  <header class="fixed top-0 left-0 right-0 bg-white shadow z-50">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <a class="font-[Pacifico] text-3xl text-primary" href="index.html">Yarn</a>
-      <nav class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
-        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="index.html" class="font-['Pacifico'] text-3xl text-primary">Yarn</a>
-          <div class="hidden md:flex items-center space-x-8">
-            <a href="index.html" class="nav-link text-gray-800 hover:text-primary transition">Главная</a>
-            <a href="Yarn-collection.html"
-              class="nav-link active text-gray-800 hover:text-primary transition">Пряжа</a>
-            <a href="New-season.html" class="nav-link text-gray-800 hover:text-primary transition">Новый сезон</a>
-            <a href="Patterns.html" class="nav-link text-gray-800 hover:text-primary transition">Паттерны</a>
-            <a href="Puffy.html" class="nav-link text-gray-800 hover:text-primary transition">Двухсторонняя</a>
-            <a href="Videos.html" class="nav-link text-gray-800 hover:text-primary transition">Видео</a>
-            <a href="Brochure.html" class="nav-link text-gray-800 hover:text-primary transition">Брошюры</a>
-            <a href="About.html" class="nav-link text-gray-800 hover:text-primary transition">О нас</a>
-            <a href="Contact.html" class="nav-link text-gray-800 hover:text-primary transition">Контакты</a>
-          </div>
-          <div class="flex items-center space-x-4">
-            <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
-              <i class="ri-search-line ri-lg"></i>
-            </button>
-            <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
-              <i class="ri-shopping-bag-line ri-lg"></i>
-            </button>
-            <button class="md:hidden w-10 h-10 flex items-center justify-center text-gray-700">
-              <i class="ri-menu-line ri-lg"></i>
-            </button>
-            <!-- Profile Button with Dropdown -->
-            <div class="relative" id="profile-dropdown">
-              <button id="profile-btn"
-                class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
-                <i class="ri-user-line ri-lg"></i>
-              </button>
-              <div id="dropdown-menu"
-                class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50 p-1">
-                <a href="Login.html"
-                  class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Вход</a>
-                <a href="Register.html"
-                  class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Регистрация</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+    <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="font-['Pacifico'] text-3xl text-primary">Yarn</a>
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="index.html" class="nav-link text-gray-800 hover:text-primary transition">Главная</a>
+        <a href="Yarn-collection.html" class="nav-link active text-gray-800 hover:text-primary transition">Пряжа</a>
+        <a href="New-season.html" class="nav-link text-gray-800 hover:text-primary transition">Новый сезон</a>
+        <a href="Patterns.html" class="nav-link text-gray-800 hover:text-primary transition">Паттерны</a>
+        <a href="Puffy.html" class="nav-link text-gray-800 hover:text-primary transition">Двухсторонняя</a>
+        <a href="Videos.html" class="nav-link text-gray-800 hover:text-primary transition">Видео</a>
+        <a href="Brochure.html" class="nav-link text-gray-800 hover:text-primary transition">Брошюры</a>
+        <a href="About.html" class="nav-link text-gray-800 hover:text-primary transition">О нас</a>
+        <a href="Contact.html" class="nav-link text-gray-800 hover:text-primary transition">Контакты</a>
+      </div>
       <div class="flex items-center space-x-4">
-        <button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-primary">
+        <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
           <i class="ri-search-line ri-lg"></i>
         </button>
+        <button class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
+          <i class="ri-shopping-bag-line ri-lg"></i>
+        </button>
+        <button class="md:hidden w-10 h-10 flex items-center justify-center text-gray-700">
+          <i class="ri-menu-line ri-lg"></i>
+        </button>
+        <!-- Profile Button with Dropdown -->
         <div class="relative" id="profile-dropdown">
-          <button class="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-primary" id="profile-btn">
+          <button id="profile-btn"
+            class="w-10 h-10 flex items-center justify-center text-gray-700 hover:text-primary transition">
             <i class="ri-user-line ri-lg"></i>
           </button>
-          <div class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50"
-            id="dropdown-menu">
-            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="login.html" id="nav-login">Вход</a>
-            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="register.html"
-              id="nav-register">Регистрация</a>
-            <a class="hidden block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" href="dashboard.html"
-              id="nav-profile">Профиль</a>
-            <a class="hidden block px-4 py-2 text-sm text-red-600 hover:bg-gray-50" href="#" id="nav-logout">Выйти</a>
+          <div id="dropdown-menu"
+            class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50 p-1">
+            <a href="Login.html"
+              class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Вход</a>
+            <a href="Register.html"
+              class="block px-4 py-2 text-sm text-gray-700 rounded-lg hover:bg-primary hover:bg-opacity-20 transition">Регистрация</a>
           </div>
         </div>
       </div>
     </div>
-  </header>
+  </nav>
+
   <!-- Content -->
   <main class="pt-32 pb-16">
     <div class="container mx-auto px-6">
@@ -160,47 +136,28 @@
       <!-- Yarn Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
-          <img alt="Classic Wool" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn1.jpg" />
+          <img alt="Classic Wool" class="w-full h-64 object-cover rounded mb-4"
+            src="https://readdy.ai/api/search-image?query=Close-up%20of%20premium%20wool%20yarn%20skein%20in%20natural%20beige%20color%20on%20clean%20white%20surface%2C%20professional%20product%20photography%20with%20soft%20natural%20lighting&width=500&height=500&seq=1&orientation=squarish" />
           <h3 class="text-xl font-medium mb-2">Classic Wool</h3>
           <p class="text-gray-600 text-sm">100% шерсть. Тёплая и мягкая. Идеальна для зимних изделий.</p>
         </div>
         <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
-          <img alt="Cotton Baby" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn2.jpg" />
+          <img alt="Cotton Baby" class="w-full h-64 object-cover rounded mb-4"
+            src="https://readdy.ai/api/search-image?query=Close-up%20of%20soft%20cotton%20yarn%20skein%20in%20pastel%20pink%20color%20on%20clean%20white%20surface%2C%20professional%20product%20photography%20with%20soft%20natural%20lighting&width=500&height=500&seq=2&orientation=squarish" />
           <h3 class="text-xl font-medium mb-2">Cotton Baby</h3>
           <p class="text-gray-600 text-sm">Хлопок для детей. Нежная текстура, гипоаллергенно.</p>
         </div>
         <div class="bg-white rounded-lg shadow hover:shadow-lg transition p-4">
-          <img alt="Angora Lux" class="w-full h-64 object-cover rounded mb-4" src="assets/img/yarn3.jpg" />
+          <img alt="Angora Lux" class="w-full h-64 object-cover rounded mb-4"
+            src="https://readdy.ai/api/search-image?query=Close-up%20of%20luxury%20angora%20yarn%20skein%20in%20soft%20gray%20color%20on%20clean%20white%20surface%2C%20professional%20product%20photography%20with%20soft%20natural%20lighting&width=500&height=500&seq=3&orientation=squarish" />
           <h3 class="text-xl font-medium mb-2">Angora Lux</h3>
           <p class="text-gray-600 text-sm">Смесь ангорки и акрила. Лёгкость и тепло в каждой нити.</p>
         </div>
       </div>
     </div>
   </main>
+
   <!-- Footer -->
-
-  <!-- Script -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      // Mobile menu toggle
-      const menuButton = document.querySelector('.ri-menu-line').parentElement;
-      const navLinks = document.querySelector('.md\\:flex');
-
-      menuButton.addEventListener('click', function () {
-        navLinks.classList.toggle('hidden');
-        navLinks.classList.toggle('flex');
-        navLinks.classList.toggle('flex-col');
-        navLinks.classList.toggle('absolute');
-        navLinks.classList.toggle('top-16');
-        navLinks.classList.toggle('left-0');
-        navLinks.classList.toggle('right-0');
-        navLinks.classList.toggle('bg-white');
-        navLinks.classList.toggle('p-6');
-        navLinks.classList.toggle('shadow-md');
-      });
-    });
-  </script>
-  <script src="js/main.module.js" type="module"></script>
   <footer class="bg-gray-100 pt-16 pb-8">
     <div class="container mx-auto px-6">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
@@ -278,6 +235,47 @@
       </div>
     </div>
   </footer>
+
+  <!-- Scripts -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Mobile menu toggle
+      const menuButton = document.querySelector('.ri-menu-line').parentElement;
+      const navLinks = document.querySelector('.md\\:flex');
+
+      menuButton.addEventListener('click', function () {
+        navLinks.classList.toggle('hidden');
+        navLinks.classList.toggle('flex');
+        navLinks.classList.toggle('flex-col');
+        navLinks.classList.toggle('absolute');
+        navLinks.classList.toggle('top-16');
+        navLinks.classList.toggle('left-0');
+        navLinks.classList.toggle('right-0');
+        navLinks.classList.toggle('bg-white');
+        navLinks.classList.toggle('p-6');
+        navLinks.classList.toggle('shadow-md');
+      });
+
+      // Profile dropdown toggle
+      const profileBtn = document.getElementById('profile-btn');
+      const dropdownMenu = document.getElementById('dropdown-menu');
+      const profileDropdown = document.getElementById('profile-dropdown');
+
+      if (profileBtn && dropdownMenu) {
+        profileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dropdownMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!profileDropdown.contains(e.target)) {
+            dropdownMenu.classList.add('hidden');
+          }
+        });
+      }
+    });
+  </script>
+  <script src="js/main.module.js" type="module"></script>
 </body>
 
 </html>
