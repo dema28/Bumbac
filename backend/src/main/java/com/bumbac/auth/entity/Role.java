@@ -1,5 +1,6 @@
 package com.bumbac.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,15 +15,16 @@ import java.util.Set;
 @Builder
 public class Role {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String code; // Пример: "USER", "ADMIN", "CONTENT_MANAGER"
+  @Column(nullable = false, unique = true)
+  private String code; // Пример: "USER", "ADMIN", "CONTENT_MANAGER"
 
-    private String name; // Пример: "Пользователь", "Администратор"
+  private String name; // Пример: "Пользователь", "Администратор"
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
+  @JsonIgnore
+  @ManyToMany(mappedBy = "roles")
+  private Set<User> users;
 }

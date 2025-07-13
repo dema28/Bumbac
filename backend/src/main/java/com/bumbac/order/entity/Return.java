@@ -1,5 +1,6 @@
 package com.bumbac.order.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,20 +16,21 @@ import java.util.List;
 @Builder
 public class Return {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Long orderId;
+  private Long orderId;
 
-    @Enumerated(EnumType.STRING)
-    private ReturnStatus status;
+  @Enumerated(EnumType.STRING)
+  private ReturnStatus status;
 
-    private BigDecimal refundAmountCzk;
+  private BigDecimal refundAmountCzk;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "returnEntity", cascade = CascadeType.ALL)
-    private List<ReturnItem> items;
+  @JsonManagedReference
+  @OneToMany(mappedBy = "returnEntity", cascade = CascadeType.ALL)
+  private List<ReturnItem> items;
 }

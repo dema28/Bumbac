@@ -1,6 +1,7 @@
 package com.bumbac.order.entity;
 
 import com.bumbac.cart.entity.Color;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,21 +13,22 @@ import lombok.*;
 @Builder
 public class OrderItem {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "color_id")
-    private Color color;
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "color_id")
+  private Color color;
 
-    @Column(nullable = false)
-    private Integer quantity;
+  @Column(nullable = false)
+  private Integer quantity;
 
-    @Column(nullable = false)
-    private Double price;
+  @Column(nullable = false)
+  private Double price;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+  @JsonBackReference
+  @ManyToOne
+  @JoinColumn(name = "order_id")
+  private Order order;
 }

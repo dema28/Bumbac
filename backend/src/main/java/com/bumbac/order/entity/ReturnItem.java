@@ -1,6 +1,7 @@
 package com.bumbac.order.entity;
 
 import com.bumbac.cart.entity.Color;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,21 +13,22 @@ import lombok.*;
 @Builder
 public class ReturnItem {
 
-    @EmbeddedId
-    private ReturnItemId id;
+  @EmbeddedId
+  private ReturnItemId id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("returnId")
-    @JoinColumn(name = "return_id")
-    private Return returnEntity;
+  @JsonBackReference
+  @ManyToOne(fetch = FetchType.LAZY)
+  @MapsId("returnId")
+  @JoinColumn(name = "return_id")
+  private Return returnEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("colorId")
-    @JoinColumn(name = "color_id")
-    private Color color;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @MapsId("colorId")
+  @JoinColumn(name = "color_id")
+  private Color color;
 
-    @Column(nullable = false)
-    private int quantity;
+  @Column(nullable = false)
+  private int quantity;
 
-    private String reason;
+  private String reason;
 }

@@ -1,5 +1,6 @@
 package com.bumbac.cart.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,15 +14,16 @@ import java.util.List;
 @Builder
 public class Cart {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private Long userId;
+  private Long userId;
 
-    private java.time.LocalDateTime createdAt;
-    private java.time.LocalDateTime updatedAt;
+  private java.time.LocalDateTime createdAt;
+  private java.time.LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items;
+  @JsonManagedReference
+  @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<CartItem> items;
 }
