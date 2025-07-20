@@ -24,7 +24,10 @@ public class Role {
 
   private String name; // Пример: "Пользователь", "Администратор"
 
-  @JsonIgnore
   @ManyToMany(mappedBy = "roles")
-  private Set<User> users;
+  @JsonIgnore
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private transient Set<User> users;
+
 }
