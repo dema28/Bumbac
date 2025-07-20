@@ -29,11 +29,11 @@ public class JwtAuthenticationFilter extends GenericFilter {
             if (user.isPresent()) {
                 var userEntity = user.get();
 
-                var userDetails = new org.springframework.security.core.userdetails.User(
+                var userDetails = new UserDetailsImpl(
                         userEntity.getEmail(),
-                        userEntity.getPasswordHash(),
-                        java.util.List.of()
+                        userEntity.getPasswordHash()
                 );
+
 
                 var authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities()

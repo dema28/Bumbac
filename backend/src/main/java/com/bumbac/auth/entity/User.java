@@ -1,7 +1,6 @@
+// User.java
 package com.bumbac.auth.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,13 +33,19 @@ public class User {
 
   private LocalDateTime createdAt;
 
-  @JsonBackReference
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<UserFavorite> favorites;
 
-  @JsonManagedReference
   @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+  @JoinTable(
+          name = "user_roles",
+          joinColumns = @JoinColumn(name = "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "role_id")
+  )
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private Set<Role> roles;
 
   public List<String> getRoleCodes() {

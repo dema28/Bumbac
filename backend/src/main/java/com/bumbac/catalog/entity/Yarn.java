@@ -2,6 +2,7 @@ package com.bumbac.catalog.entity;
 
 import com.bumbac.auth.entity.UserFavorite;
 import com.bumbac.cart.entity.Color;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,8 +35,11 @@ public class Yarn {
 
     private LocalDateTime createdAt;
 
-    @JsonManagedReference
+
     @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<UserFavorite> favorites;
 
     @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
