@@ -43,7 +43,10 @@ public class SecurityConfig {
                                 "/api/newsletter/**",
                                 "/api/catalog/**",
                                 "/api/contact/**",
-                                "/api/yarns/**"
+                                "/api/yarns/**",
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/actuator/prometheus"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
