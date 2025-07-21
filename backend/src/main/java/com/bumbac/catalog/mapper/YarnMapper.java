@@ -11,8 +11,6 @@ public class YarnMapper {
     public Yarn toEntity(YarnRequest request) {
         return Yarn.builder()
                 .name(request.getName())
-                .brand(request.getBrand())
-                .category(request.getCategory())
                 .material(request.getMaterial())
                 .weight(request.getWeight())
                 .length(request.getLength())
@@ -25,8 +23,8 @@ public class YarnMapper {
         return YarnResponse.builder()
                 .id(yarn.getId())
                 .name(yarn.getName())
-                .brand(yarn.getBrand())
-                .category(yarn.getCategory())
+                .brand(yarn.getBrand() != null ? yarn.getBrand().getName() : null)
+                .category(yarn.getCategory() != null ? yarn.getCategory().getName() : null)
                 .material(yarn.getMaterial())
                 .weight(yarn.getWeight())
                 .length(yarn.getLength())
@@ -34,4 +32,6 @@ public class YarnMapper {
                 .priceUSD(yarn.getPriceUSD())
                 .build();
     }
+
 }
+

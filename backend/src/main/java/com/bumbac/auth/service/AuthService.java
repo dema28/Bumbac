@@ -29,32 +29,36 @@ public class AuthService {
       throw new RuntimeException("Email already in use");
     }
 
-    Role userRole = roleRepository.findByCode("USER")
-        .orElseThrow(() -> new RuntimeException("Role USER not found"));
+    String roleCode = request.getRole() != null ? request.getRole().toUpperCase() : "USER";
+    Role userRole = roleRepository.findByCode(roleCode)
+            .orElseThrow(() -> new RuntimeException("Role " + roleCode + " not found"));
+
     User user = User.builder()
-        .email(request.getEmail())
-        .passwordHash(passwordEncoder.encode(request.getPassword()))
-        .firstName(request.getFirstName())
-        .lastName(request.getLastName())
-        .phone(request.getPhone())
-        .roles(Set.of(userRole))
-        .createdAt(LocalDateTime.now())
-        .build();
+            .email(request.getEmail())
+            .passwordHash(passwordEncoder.encode(request.getPassword()))
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .phone(request.getPhone())
+            .roles(Set.of(userRole))
+            .createdAt(LocalDateTime.now())
+            .build();
 
     userRepository.save(user);
 
-    String token = jwtService.generateToken(user.getEmail());
+    String token = jwtService.generateToken(user); // ✅ фикс
     return new AuthResponse(token);
   }
 
   public AuthResponse login(LoginRequest request) {
     authManager.authenticate(new UsernamePasswordAuthenticationToken(
-        request.getEmail(), request.getPassword()));
+            request.getEmail(), request.getPassword()));
 
     User user = userRepository.findByEmail(request.getEmail())
-        .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-    String token = jwtService.generateToken(user.getEmail());
+    String token = jwtService.generateToken(user); // ✅ фикс
     return new AuthResponse(token);
   }
+
+
 }

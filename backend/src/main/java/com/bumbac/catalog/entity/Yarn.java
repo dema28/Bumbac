@@ -3,7 +3,6 @@ package com.bumbac.catalog.entity;
 import com.bumbac.auth.entity.UserFavorite;
 import com.bumbac.cart.entity.Color;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Yarn {
 
     @Id
@@ -25,16 +23,30 @@ public class Yarn {
     private Long id;
 
     private String name;
-    private String brand;
-    private String category;
     private String material;
     private Double weight;
     private Double length;
+
+    @Column(name = "pricemdl")
     private Double priceMDL;
+
+    @Column(name = "priceusd")
     private Double priceUSD;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "collection_id", nullable = false)
+    private Collection collection;
+
+    @ManyToOne
+    @JoinColumn(name = "brand_id", nullable = false)
+    private Brand brand;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -47,6 +59,4 @@ public class Yarn {
 
     @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Color> colors;
-
-
 }

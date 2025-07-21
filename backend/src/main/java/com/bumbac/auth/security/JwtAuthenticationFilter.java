@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -21,22 +22,32 @@ public class JwtAuthenticationFilter extends GenericFilter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
         HttpServletRequest http = (HttpServletRequest) request;
-
         String email = jwtService.extractUsernameFromHeader(http);
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var user = userRepository.findByEmail(email);
-            if (user.isPresent()) {
-                var userEntity = user.get();
 
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            var userOpt = userRepository.findByEmail(email);
+
+            if (userOpt.isPresent()) {
+                var user = userOpt.get();
+
+                // Извлекаем роли в виде строк (например: ADMIN, USER)
+                var roleCodes = user.getRoles().stream()
+                        .map(role -> role.getCode())
+                        .collect(Collectors.toList());
+
+                // Создаём UserDetails с ролями
                 var userDetails = new UserDetailsImpl(
-                        userEntity.getEmail(),
-                        userEntity.getPasswordHash()
+                        user.getEmail(),
+                        user.getPasswordHash(),
+                        roleCodes
                 );
 
-
                 var authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities() // ✅ теперь включает ROLE_ADMIN и другие
                 );
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(http));

@@ -1,5 +1,6 @@
 package com.bumbac.auth.security;
 
+import com.bumbac.auth.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,15 +19,18 @@ public class JwtService {
     @Value("${JWT_EXPIRATION}")
     private long jwtExpiration;
 
-    // 🔧 ВАЖНО: принимаем только email, НЕ User
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getEmail())
+                .claim("roles", user.getRoles().stream()
+                        .map(role -> "ROLE_" + role.getCode())
+                        .toList())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public String extractUsername(String token) {
         return Jwts.parserBuilder()

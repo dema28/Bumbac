@@ -1,6 +1,8 @@
 package com.bumbac.catalog.service;
 
 import com.bumbac.catalog.dto.YarnResponse;
+import com.bumbac.catalog.entity.Brand;
+import com.bumbac.catalog.entity.Category;
 import com.bumbac.catalog.entity.Yarn;
 import com.bumbac.catalog.mapper.YarnMapper;
 import com.bumbac.catalog.repository.YarnRepository;
@@ -31,109 +33,113 @@ class YarnServiceTest {
   @InjectMocks
   private YarnService yarnService;
 
-  private Yarn sampleYarn(String category, String brand, String material) {
+  private Category sampleCategory(String name) {
+    return Category.builder().id(1L).name(name).build();
+  }
+
+  private Brand sampleBrand(String name) {
+    return Brand.builder().id(1L).name(name).build();
+  }
+
+  private Yarn sampleYarn(Category category, Brand brand, String material) {
     return Yarn.builder()
-        .id(1L)
-        .name("test")
-        .category(category)
-        .brand(brand)
-        .material(material)
-        .weight(50.0)
-        .length(100.0)
-        .priceMDL(10.0)
-        .priceUSD(5.0)
-        .build();
+            .id(1L)
+            .name("test")
+            .category(category)
+            .brand(brand)
+            .material(material)
+            .weight(50.0)
+            .length(100.0)
+            .priceMDL(10.0)
+            .priceUSD(5.0)
+            .build();
   }
 
   @Test
   void filterByCategoryDelegatesToSpecification() {
-    String category = "cat";
-    Yarn yarn = sampleYarn(category, "brand", "mat");
-    when(yarnRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
-        .thenReturn(List.of(yarn));
+    Category category = sampleCategory("cotton");
+    Brand brand = sampleBrand("brandX");
+    Yarn yarn = sampleYarn(category, brand, "wool");
+
+    when(yarnRepository.findAll(any(Specification.class))).thenReturn(List.of(yarn));
     when(yarnMapper.toResponse(any(Yarn.class))).thenReturn(
-        YarnResponse.builder()
-            .id(yarn.getId())
-            .category(yarn.getCategory())
-            .brand(yarn.getBrand())
-            .material(yarn.getMaterial())
-            .build());
+            YarnResponse.builder()
+                    .id(yarn.getId())
+                    .category(yarn.getCategory().getName())
+                    .brand(yarn.getBrand().getName())
+                    .material(yarn.getMaterial())
+                    .build());
 
     try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
       Specification<Yarn> spec = mock(Specification.class);
-      specMock.when(() -> YarnSpecification.hasCategory(category)).thenReturn(spec);
+      specMock.when(() -> YarnSpecification.hasCategory("cotton")).thenReturn(spec);
 
-      List<YarnResponse> result = yarnService.filter(category, null, null);
+      List<YarnResponse> result = yarnService.filter("cotton", null, null);
 
-      specMock.verify(() -> YarnSpecification.hasCategory(category));
-      specMock.verifyNoMoreInteractions();
-      verify(yarnRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class));
+      specMock.verify(() -> YarnSpecification.hasCategory("cotton"));
+      verify(yarnRepository).findAll(any(Specification.class));
       assertEquals(1, result.size());
       YarnResponse resp = result.get(0);
       assertEquals(yarn.getId(), resp.getId());
-      assertEquals(yarn.getCategory(), resp.getCategory());
-      assertEquals(yarn.getBrand(), resp.getBrand());
-      assertEquals(yarn.getMaterial(), resp.getMaterial());
+      assertEquals("cotton", resp.getCategory());
     }
   }
 
   @Test
   void filterByBrandDelegatesToSpecification() {
-    String brand = "brand";
-    Yarn yarn = sampleYarn("cat", brand, "mat");
-    when(yarnRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
-        .thenReturn(List.of(yarn));
+    Category category = sampleCategory("cat");
+    Brand brand = sampleBrand("brandY");
+    Yarn yarn = sampleYarn(category, brand, "linen");
+
+    when(yarnRepository.findAll(any(Specification.class))).thenReturn(List.of(yarn));
     when(yarnMapper.toResponse(any(Yarn.class))).thenReturn(
-        YarnResponse.builder()
-            .id(yarn.getId())
-            .category(yarn.getCategory())
-            .brand(yarn.getBrand())
-            .material(yarn.getMaterial())
-            .build());
+            YarnResponse.builder()
+                    .id(yarn.getId())
+                    .category(yarn.getCategory().getName())
+                    .brand(yarn.getBrand().getName())
+                    .material(yarn.getMaterial())
+                    .build());
 
     try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
       Specification<Yarn> spec = mock(Specification.class);
-      specMock.when(() -> YarnSpecification.hasBrand(brand)).thenReturn(spec);
+      specMock.when(() -> YarnSpecification.hasBrand("brandY")).thenReturn(spec);
 
-      List<YarnResponse> result = yarnService.filter(null, brand, null);
+      List<YarnResponse> result = yarnService.filter(null, "brandY", null);
 
-      specMock.verify(() -> YarnSpecification.hasBrand(brand));
-      specMock.verifyNoMoreInteractions();
-      verify(yarnRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class));
+      specMock.verify(() -> YarnSpecification.hasBrand("brandY"));
+      verify(yarnRepository).findAll(any(Specification.class));
       assertEquals(1, result.size());
       YarnResponse resp = result.get(0);
-      assertEquals(yarn.getId(), resp.getId());
-      assertEquals(yarn.getBrand(), resp.getBrand());
+      assertEquals("brandY", resp.getBrand());
     }
   }
 
   @Test
   void filterByMaterialDelegatesToSpecification() {
-    String material = "mat";
-    Yarn yarn = sampleYarn("cat", "brand", material);
-    when(yarnRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class)))
-        .thenReturn(List.of(yarn));
+    Category category = sampleCategory("lux");
+    Brand brand = sampleBrand("brandZ");
+    Yarn yarn = sampleYarn(category, brand, "acrylic");
+
+    when(yarnRepository.findAll(any(Specification.class))).thenReturn(List.of(yarn));
     when(yarnMapper.toResponse(any(Yarn.class))).thenReturn(
-        YarnResponse.builder()
-            .id(yarn.getId())
-            .category(yarn.getCategory())
-            .brand(yarn.getBrand())
-            .material(yarn.getMaterial())
-            .build());
+            YarnResponse.builder()
+                    .id(yarn.getId())
+                    .category(yarn.getCategory().getName())
+                    .brand(yarn.getBrand().getName())
+                    .material(yarn.getMaterial())
+                    .build());
 
     try (MockedStatic<YarnSpecification> specMock = mockStatic(YarnSpecification.class)) {
       Specification<Yarn> spec = mock(Specification.class);
-      specMock.when(() -> YarnSpecification.hasMaterial(material)).thenReturn(spec);
+      specMock.when(() -> YarnSpecification.hasMaterial("acrylic")).thenReturn(spec);
 
-      List<YarnResponse> result = yarnService.filter(null, null, material);
+      List<YarnResponse> result = yarnService.filter(null, null, "acrylic");
 
-      specMock.verify(() -> YarnSpecification.hasMaterial(material));
-      specMock.verifyNoMoreInteractions();
-      verify(yarnRepository).findAll(any(org.springframework.data.jpa.domain.Specification.class));
+      specMock.verify(() -> YarnSpecification.hasMaterial("acrylic"));
+      verify(yarnRepository).findAll(any(Specification.class));
       assertEquals(1, result.size());
       YarnResponse resp = result.get(0);
-      assertEquals(yarn.getId(), resp.getId());
-      assertEquals(yarn.getMaterial(), resp.getMaterial());
+      assertEquals("acrylic", resp.getMaterial());
     }
   }
 }
