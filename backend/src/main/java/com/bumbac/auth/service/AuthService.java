@@ -29,9 +29,9 @@ public class AuthService {
       throw new RuntimeException("Email already in use");
     }
 
-    String roleCode = request.getRole() != null ? request.getRole().toUpperCase() : "USER";
-    Role userRole = roleRepository.findByCode(roleCode)
-            .orElseThrow(() -> new RuntimeException("Role " + roleCode + " not found"));
+    // Безопасно назначаем только роль USER, игнорируя любые данные извне
+    Role userRole = roleRepository.findByCode("USER")
+            .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
     User user = User.builder()
             .email(request.getEmail())
@@ -45,7 +45,7 @@ public class AuthService {
 
     userRepository.save(user);
 
-    String token = jwtService.generateToken(user); // ✅ фикс
+    String token = jwtService.generateToken(user);
     return new AuthResponse(token);
   }
 
@@ -56,9 +56,7 @@ public class AuthService {
     User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-    String token = jwtService.generateToken(user); // ✅ фикс
+    String token = jwtService.generateToken(user);
     return new AuthResponse(token);
   }
-
-
 }

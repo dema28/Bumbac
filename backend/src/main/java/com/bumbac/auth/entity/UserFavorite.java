@@ -18,23 +18,21 @@ import java.time.LocalDateTime;
 @Builder
 public class UserFavorite {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @EmbeddedId
+    private UserFavoriteId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("user")
+    @JoinColumn(name = "user_id")
     @JsonIgnore
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private User user;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("yarn")
+    @JoinColumn(name = "yarn_id")
     @JsonIgnore
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Yarn yarn;
 
     private LocalDateTime addedAt;
 }
+

@@ -53,4 +53,12 @@ public class GlobalExceptionHandler {
                 new ErrorResponse(LocalDateTime.now(), "Unexpected error: " + ex.getMessage(), request.getRequestURI())
         );
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(LocalDateTime.now(), ex.getMessage(), request.getRequestURI())
+        );
+    }
+
 }

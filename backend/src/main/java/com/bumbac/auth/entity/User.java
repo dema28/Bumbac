@@ -1,4 +1,3 @@
-// User.java
 package com.bumbac.auth.entity;
 
 import jakarta.persistence.*;

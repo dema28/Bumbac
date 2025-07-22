@@ -9,7 +9,6 @@ public class FavoriteMapper {
 
     public FavoriteDTO toDto(UserFavorite fav) {
         return FavoriteDTO.builder()
-                .id(fav.getId())
                 .yarnId(fav.getYarn().getId())
                 .yarnName(fav.getYarn().getName())
                 .addedAt(fav.getAddedAt())

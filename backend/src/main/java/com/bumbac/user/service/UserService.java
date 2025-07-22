@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.bumbac.exception.UserNotFoundException;
+
 import java.util.List;
 
 @Service
@@ -63,6 +65,9 @@ public class UserService {
     }
 
     public void deleteById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException(id);
+        }
         userRepository.deleteById(id);
     }
 }
