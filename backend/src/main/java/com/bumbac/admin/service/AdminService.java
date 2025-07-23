@@ -6,6 +6,7 @@ import com.bumbac.auth.entity.User;
 import com.bumbac.auth.repository.RoleRepository;
 import com.bumbac.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,33 +14,50 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminService {
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
 
   public List<UserAdminDTO> getAllUsers() {
-    return userRepository.findAll().stream()
-        .map(user -> UserAdminDTO.builder()
-            .id(user.getId())
-            .email(user.getEmail())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .roles(user.getRoleCodes())
-            .build())
-        .toList();
+    List<User> users = userRepository.findAll();
+    return users.stream()
+            .map(user -> UserAdminDTO.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .roles(user.getRoleCodes()) // предполагается метод getRoleCodes() → List<String>
+                    .build())
+            .toList();
   }
 
   public void deleteUser(Long id) {
+    if (!userRepository.existsById(id)) {
+      log.warn("Попытка удалить несуществующего пользователя с ID={}", id);
+      throw new IllegalArgumentException("Пользователь не найден");
+    }
     userRepository.deleteById(id);
+    log.info("Пользователь с ID={} успешно удалён", id);
   }
 
-  public void updateRole(Long userId, String role) {
+  public void updateRole(Long userId, String roleCode) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new RuntimeException("User not found"));
-    Role roleEntity = roleRepository.findByCode(role.toUpperCase())
-        .orElseThrow(() -> new RuntimeException("Role not found: " + role));
-    user.setRoles(Set.of(roleEntity));
+            .orElseThrow(() -> {
+              log.error("Пользователь с ID={} не найден", userId);
+              return new IllegalArgumentException("Пользователь не найден");
+            });
+
+    Role role = roleRepository.findByCode(roleCode.toUpperCase())
+            .orElseThrow(() -> {
+              log.error("Роль '{}' не найдена", roleCode);
+              return new IllegalArgumentException("Роль не найдена: " + roleCode);
+            });
+
+    user.setRoles(Set.of(role));
     userRepository.save(user);
+
+    log.info("Роль пользователя ID={} успешно обновлена на '{}'", userId, role.getCode());
   }
 }
