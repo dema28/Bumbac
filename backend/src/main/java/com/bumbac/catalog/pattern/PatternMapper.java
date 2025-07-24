@@ -13,7 +13,7 @@ public class PatternMapper {
                 .orElseGet(() -> fallbackToEn(pattern));
 
         String yarnName = pattern.getYarn().getTranslations().stream()
-                .filter(t -> t.getLocale().equalsIgnoreCase(lang))
+                .filter(t -> t.getId().getLocale().equalsIgnoreCase(lang))
                 .map(YarnTranslation::getName)
                 .findFirst()
                 .orElse("Unnamed Yarn");

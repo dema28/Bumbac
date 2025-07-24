@@ -9,5 +9,6 @@ public class CreatePaymentRequest {
     private Long orderId;
     private String provider;
     private String providerTxId;
-    private BigDecimal amountCzk;
+    private BigDecimal amountMdl;
+    private BigDecimal amountUsd;
 }

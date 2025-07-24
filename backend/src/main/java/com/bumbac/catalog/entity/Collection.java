@@ -1,5 +1,6 @@
 package com.bumbac.catalog.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,5 +25,6 @@ public class Collection {
     private String description;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Yarn> yarns;
 }

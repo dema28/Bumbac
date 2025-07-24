@@ -20,11 +20,13 @@ public class ReturnMapper {
                 .id(r.getId())
                 .orderId(r.getOrderId())
                 .status(r.getStatus())
-                .refundAmountCzk(r.getRefundAmountCzk())
+                .refundAmountMdl(r.getRefundAmountMdl())
+                .refundAmountUsd(r.getRefundAmountUsd())
                 .createdAt(r.getCreatedAt())
                 .items(items)
                 .build();
     }
+
 
     public ReturnItemDTO toItemDto(ReturnItem item) {
         ReturnItemDTO dto = new ReturnItemDTO();

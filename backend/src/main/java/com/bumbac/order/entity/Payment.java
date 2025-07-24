@@ -26,6 +26,12 @@ public class Payment {
 
     private String provider;
     private String providerTxId;
-    private BigDecimal amountCzk;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal amountMdl;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal amountUsd;
+
     private LocalDateTime paidAt;
 }

@@ -12,16 +12,15 @@ import lombok.*;
 @AllArgsConstructor
 public class YarnTranslation {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private YarnTranslationId id;
 
-    private String locale;
-
+    @Column(nullable = false)
     private String name;
 
     private String description;
 
+    @MapsId("yarnId")
     @ManyToOne
     @JoinColumn(name = "yarn_id")
     private Yarn yarn;

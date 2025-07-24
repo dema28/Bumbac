@@ -3,6 +3,7 @@ package com.bumbac.order.controller;
 import com.bumbac.auth.entity.User;
 import com.bumbac.order.entity.Order;
 import com.bumbac.order.service.OrderService;
+import com.bumbac.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,21 +19,24 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final UserService userService;
+
 
     @PostMapping
     public ResponseEntity<?> placeOrder(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = new User(); // временно, если UserDetails не кастуется
-        user.setId(1L);         // заменить на `userService.findByUsername(...)`
+        User user = userService.getCurrentUser(userDetails.getUsername());
         orderService.placeOrder(user);
         return ResponseEntity.ok("Order placed");
     }
 
+
+
     @GetMapping
     public ResponseEntity<List<Order>> getUserOrders(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = new User();
-        user.setId(1L);
+        User user = userService.getCurrentUser(userDetails.getUsername());
         return ResponseEntity.ok(orderService.getUserOrders(user));
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")

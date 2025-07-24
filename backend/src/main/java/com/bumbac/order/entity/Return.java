@@ -25,7 +25,11 @@ public class Return {
   @Enumerated(EnumType.STRING)
   private ReturnStatus status;
 
-  private BigDecimal refundAmountCzk;
+  @Column(precision = 12, scale = 2)
+  private BigDecimal refundAmountMdl;
+
+  @Column(precision = 12, scale = 2)
+  private BigDecimal refundAmountUsd;
 
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
