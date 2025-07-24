@@ -14,7 +14,8 @@ public class PaymentMapper {
                 .status(p.getStatus().getCode())
                 .provider(p.getProvider())
                 .providerTxId(p.getProviderTxId())
-                .amountCzk(p.getAmountCzk())
+                .amountMdl(p.getAmountMdl())
+                .amountUsd(p.getAmountUsd())
                 .paidAt(p.getPaidAt())
                 .build();
     }

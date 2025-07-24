@@ -14,6 +14,7 @@ public class PaymentDTO {
     private String status;
     private String provider;
     private String providerTxId;
-    private BigDecimal amountCzk;
+    private BigDecimal amountMdl;
+    private BigDecimal amountUsd;
     private LocalDateTime paidAt;
 }

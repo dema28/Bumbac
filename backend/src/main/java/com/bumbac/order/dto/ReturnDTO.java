@@ -14,7 +14,8 @@ public class ReturnDTO {
     private Long id;
     private Long orderId;
     private ReturnStatus status;
-    private BigDecimal refundAmountCzk;
+    private BigDecimal refundAmountMdl;
+    private BigDecimal refundAmountUsd;
     private LocalDateTime createdAt;
     private List<ReturnItemDTO> items;
 }

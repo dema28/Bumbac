@@ -2,6 +2,7 @@ package com.bumbac.catalog.entity;
 
 import com.bumbac.auth.entity.UserFavorite;
 import com.bumbac.cart.entity.Color;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,6 +39,7 @@ public class Yarn {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "collection_id", nullable = false)
+    @JsonBackReference
     private Collection collection;
 
     @ManyToOne
@@ -58,5 +60,6 @@ public class Yarn {
     private List<YarnTranslation> translations;
 
     @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Color> colors;
 }

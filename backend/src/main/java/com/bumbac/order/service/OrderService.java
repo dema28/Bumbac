@@ -8,6 +8,7 @@ import com.bumbac.cart.repository.CartRepository;
 import com.bumbac.order.dto.ReturnDTO;
 import com.bumbac.order.entity.Order;
 import com.bumbac.order.entity.OrderItem;
+import com.bumbac.order.entity.OrderStatus;
 import com.bumbac.order.entity.Return;
 import com.bumbac.order.repository.OrderRepository;
 import jakarta.transaction.Transactional;
@@ -52,6 +53,7 @@ public class OrderService {
                 .user(user)
                 .createdAt(LocalDateTime.now())
                 .totalAmount(total)
+                .status(OrderStatus.NEW)
                 .build();
 
         List<OrderItem> items = cartItems.stream()

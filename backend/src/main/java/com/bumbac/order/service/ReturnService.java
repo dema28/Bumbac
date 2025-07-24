@@ -95,7 +95,8 @@ public class ReturnService {
         returnItemRepository.saveAll(returnItems);
 
         // 6. Итоговая сумма и обновление возврата
-        ret.setRefundAmountCzk(totalRefund.get()); // обновляем сумму возврата
+        ret.setRefundAmountMdl(totalRefund.get()); // обновляем сумму возврата
+        ret.setRefundAmountUsd(totalRefund.get());
         ret.setUpdatedAt(LocalDateTime.now());
         returnRepository.save(ret); // сохраняем обновлённый возврат
 

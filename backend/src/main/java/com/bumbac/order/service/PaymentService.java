@@ -42,7 +42,9 @@ public class PaymentService {
                 .orderId(request.getOrderId())
                 .provider(request.getProvider())
                 .providerTxId(request.getProviderTxId())
-                .amountCzk(request.getAmountCzk())
+                .amountMdl(request.getAmountMdl())
+                .amountUsd(request.getAmountUsd())
+
                 .status(status)
                 .paidAt(LocalDateTime.now())
                 .build();
@@ -56,7 +58,9 @@ public class PaymentService {
 
         Payment refund = Payment.builder()
                 .orderId(ret.getOrderId())
-                .amountCzk(ret.getRefundAmountCzk())
+                .amountMdl(ret.getRefundAmountMdl())
+                .amountUsd(ret.getRefundAmountUsd())
+
                 .status(refundedStatus)
                 .provider("REFUND")
                 .paidAt(LocalDateTime.now())
