@@ -1,7 +1,12 @@
 package com.bumbac.auth.controller;
 
 import com.bumbac.auth.dto.*;
+import com.bumbac.auth.entity.RefreshToken;
+import com.bumbac.auth.entity.User;
+import com.bumbac.auth.security.JwtService;
 import com.bumbac.auth.service.AuthService;
+import com.bumbac.auth.service.RefreshTokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +24,8 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request,
@@ -52,4 +59,37 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshRequest request) {
+        try {
+            RefreshToken token = refreshTokenService.validate(request.getRefreshToken());
+            String newAccessToken = jwtService.generateToken(token.getUser());
+
+            return ResponseEntity.ok(new RefreshResponse(newAccessToken));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(403).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 403,
+                    "error", "Forbidden",
+                    "message", ex.getMessage(),
+                    "path", "/api/auth/refresh"
+            ));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = jwtService.extractTokenFromHeader(request);
+        String email = jwtService.extractUsername(token);
+
+        User user = authService.getUserByEmail(email);
+        refreshTokenService.deleteByUserId(user.getId());
+
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "message", "Logout successful"
+        ));
+    }
+
 }

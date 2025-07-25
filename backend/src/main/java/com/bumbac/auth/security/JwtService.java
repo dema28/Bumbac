@@ -50,4 +50,17 @@ public class JwtService {
     private Key getKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
+
+
+    public String extractTokenFromHeader(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        throw new RuntimeException("Missing or invalid Authorization header");
+    }
+
+
 }
+
+

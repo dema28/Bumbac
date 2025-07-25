@@ -6,9 +6,11 @@ import com.bumbac.auth.entity.User;
 import com.bumbac.auth.repository.RoleRepository;
 import com.bumbac.auth.repository.UserRepository;
 import com.bumbac.auth.security.JwtService;
+import com.bumbac.auth.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,6 +27,7 @@ public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authManager;
   private final RoleRepository roleRepository;
+  private final RefreshTokenService refreshTokenService;
 
   public AuthResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
@@ -33,7 +36,6 @@ public class AuthService {
       );
     }
 
-    // Безопасно назначаем только роль USER, игнорируя любые данные извне
     Role userRole = roleRepository.findByCode("USER")
             .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
@@ -50,17 +52,29 @@ public class AuthService {
     userRepository.save(user);
 
     String token = jwtService.generateToken(user);
-    return new AuthResponse(token);
+    return new AuthResponse(token, null); // refresh не нужен при регистрации
   }
 
   public AuthResponse login(LoginRequest request) {
-    authManager.authenticate(new UsernamePasswordAuthenticationToken(
-            request.getEmail(), request.getPassword()));
+    try {
+      authManager.authenticate(
+              new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+    } catch (AuthenticationException ex) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+    }
 
     User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-    String token = jwtService.generateToken(user);
-    return new AuthResponse(token);
+    String accessToken = jwtService.generateToken(user);
+    String refreshToken = refreshTokenService.create(user).getToken();
+
+    return new AuthResponse(accessToken, refreshToken);
   }
+
+  public User getUserByEmail(String email) {
+    return userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+  }
+
 }
