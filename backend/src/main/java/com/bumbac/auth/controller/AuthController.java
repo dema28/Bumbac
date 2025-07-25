@@ -56,8 +56,31 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+                                   BindingResult result) {
+        if (result.hasErrors()) {
+            var errors = result.getFieldErrors().stream()
+                    .map(e -> Map.of("field", e.getField(), "message", e.getDefaultMessage()))
+                    .toList();
+            return ResponseEntity.badRequest().body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 400,
+                    "error", "Validation failed",
+                    "messages", errors
+            ));
+        }
+
+        try {
+            return ResponseEntity.ok(authService.login(request));
+        } catch (ResponseStatusException ex) {
+            return ResponseEntity.status(ex.getStatusCode()).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", ex.getStatusCode().value(),
+                    "error", HttpStatus.valueOf(ex.getStatusCode().value()).getReasonPhrase(),
+                    "message", ex.getReason(),
+                    "path", "/api/auth/login"
+            ));
+        }
     }
 
     @PostMapping("/refresh")
@@ -91,5 +114,6 @@ public class AuthController {
                 "message", "Logout successful"
         ));
     }
+
 
 }

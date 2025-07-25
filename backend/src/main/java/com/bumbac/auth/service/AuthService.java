@@ -14,6 +14,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.AuthenticationException;
+
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -62,6 +64,12 @@ public class AuthService {
     } catch (AuthenticationException ex) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
+    try {
+      authManager.authenticate(new UsernamePasswordAuthenticationToken(
+              request.getEmail(), request.getPassword()));
+    } catch (AuthenticationException ex) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+    }
 
     User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
@@ -71,6 +79,8 @@ public class AuthService {
 
     return new AuthResponse(accessToken, refreshToken);
   }
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
 
   public User getUserByEmail(String email) {
     return userRepository.findByEmail(email)
