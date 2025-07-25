@@ -9,11 +9,10 @@ import com.bumbac.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.security.core.AuthenticationException;
-
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -27,15 +26,13 @@ public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authManager;
   private final RoleRepository roleRepository;
+  private final com.bumbac.auth.service.RefreshTokenService refreshTokenService;
 
   public AuthResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
-      throw new ResponseStatusException(
-              HttpStatus.CONFLICT, "Email already in use"
-      );
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
     }
 
-    // Безопасно назначаем только роль USER, игнорируя любые данные извне
     Role userRole = roleRepository.findByCode("USER")
             .orElseThrow(() -> new RuntimeException("Default role USER not found"));
 
@@ -51,14 +48,14 @@ public class AuthService {
 
     userRepository.save(user);
 
-    String token = jwtService.generateToken(user);
-    return new AuthResponse(token);
+    String accessToken = jwtService.generateToken(user);
+    return new AuthResponse(accessToken, null); // refresh не нужен при регистрации
   }
 
   public AuthResponse login(LoginRequest request) {
     try {
-      authManager.authenticate(new UsernamePasswordAuthenticationToken(
-              request.getEmail(), request.getPassword()));
+      authManager.authenticate(
+              new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
     } catch (AuthenticationException ex) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
@@ -66,8 +63,14 @@ public class AuthService {
     User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
+    String accessToken = jwtService.generateToken(user);
+    String refreshToken = refreshTokenService.create(user).getToken();
 
-    String token = jwtService.generateToken(user);
-    return new AuthResponse(token);
+    return new AuthResponse(accessToken, refreshToken);
+  }
+
+  public User getUserByEmail(String email) {
+    return userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
   }
 }
