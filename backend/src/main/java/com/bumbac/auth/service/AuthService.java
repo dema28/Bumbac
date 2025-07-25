@@ -7,9 +7,11 @@ import com.bumbac.auth.repository.RoleRepository;
 import com.bumbac.auth.repository.UserRepository;
 import com.bumbac.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -26,7 +28,9 @@ public class AuthService {
 
   public AuthResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
-      throw new RuntimeException("Email already in use");
+      throw new ResponseStatusException(
+              HttpStatus.CONFLICT, "Email already in use"
+      );
     }
 
     // Безопасно назначаем только роль USER, игнорируя любые данные извне
