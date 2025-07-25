@@ -26,11 +26,18 @@ public class AuthService {
   private final JwtService jwtService;
   private final AuthenticationManager authManager;
   private final RoleRepository roleRepository;
-  private final com.bumbac.auth.service.RefreshTokenService refreshTokenService;
+  private final RefreshTokenService refreshTokenService;
 
   public AuthResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+    }
+
+    if (userRepository.existsByPhone(request.getPhone())) {
+      throw new ResponseStatusException(
+              HttpStatus.CONFLICT,
+              "Phone already in use. Would you like to restore your account?"
+      );
     }
 
     Role userRole = roleRepository.findByCode("USER")
