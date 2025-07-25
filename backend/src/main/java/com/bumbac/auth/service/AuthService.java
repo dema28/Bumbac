@@ -12,6 +12,8 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.AuthenticationException;
+
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -54,11 +56,16 @@ public class AuthService {
   }
 
   public AuthResponse login(LoginRequest request) {
-    authManager.authenticate(new UsernamePasswordAuthenticationToken(
-            request.getEmail(), request.getPassword()));
+    try {
+      authManager.authenticate(new UsernamePasswordAuthenticationToken(
+              request.getEmail(), request.getPassword()));
+    } catch (AuthenticationException ex) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+    }
 
     User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
 
     String token = jwtService.generateToken(user);
     return new AuthResponse(token);

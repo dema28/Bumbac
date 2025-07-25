@@ -20,4 +20,14 @@ public class RateLimiterConfig {
         registration.setOrder(0); // До Spring Security (важно!)
         return registration;
     }
+
+    @Bean
+    public FilterRegistrationBean<Filter> loginRateLimiterRegistration(LoginRateLimitFilter loginFilter) {
+        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(loginFilter);
+        registration.addUrlPatterns("/api/auth/login");
+        registration.setOrder(2); // чуть позже, чем регистрация
+        return registration;
+    }
+
 }
