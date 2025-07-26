@@ -1,5 +1,6 @@
 package com.bumbac.auth.security;
 
+import com.bumbac.auth.entity.Role;
 import com.bumbac.auth.repository.UserRepository;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -24,37 +25,52 @@ public class JwtAuthenticationFilter extends GenericFilter {
             throws IOException, ServletException {
 
         HttpServletRequest http = (HttpServletRequest) request;
-        String email = jwtService.extractUsernameFromHeader(http);
+        HttpServletResponse httpResp = (HttpServletResponse) response;
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            var userOpt = userRepository.findByEmail(email);
+        try {
+            String email = jwtService.extractUsernameFromHeader(http);
 
-            if (userOpt.isPresent()) {
-                var user = userOpt.get();
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                var userOpt = userRepository.findByEmail(email);
 
-                // Извлекаем роли в виде строк (например: ADMIN, USER)
-                var roleCodes = user.getRoles().stream()
-                        .map(role -> role.getCode())
-                        .collect(Collectors.toList());
+                if (userOpt.isPresent()) {
+                    var user = userOpt.get();
 
-                // Создаём UserDetails с ролями
-                var userDetails = new UserDetailsImpl(
-                        user.getEmail(),
-                        user.getPasswordHash(),
-                        roleCodes
-                );
+                    var roleCodes = user.getRoles().stream()
+                            .map(Role::getCode)
+                            .collect(Collectors.toList());
 
-                var authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities() // ✅ теперь включает ROLE_ADMIN и другие
-                );
+                    var userDetails = new UserDetailsImpl(
+                            user.getEmail(),
+                            user.getPasswordHash(),
+                            roleCodes
+                    );
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(http));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    var authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(http));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
-        }
 
-        chain.doFilter(request, response);
+            chain.doFilter(request, response);
+
+        } catch (Exception ex) {
+            httpResp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            httpResp.setContentType("application/json");
+            httpResp.getWriter().write("""
+        {
+          "status": 403,
+          "error": "Forbidden",
+          "message": "Authentication required",
+          "path": "%s"
+        }
+        """.formatted(http.getRequestURI()));
+        }
     }
+
 }
