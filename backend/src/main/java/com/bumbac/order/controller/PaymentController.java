@@ -1,17 +1,22 @@
 package com.bumbac.order.controller;
 
+import com.bumbac.auth.entity.User;
+import com.bumbac.auth.security.UserDetailsImpl;
 import com.bumbac.common.dto.ErrorResponse;
 import com.bumbac.order.dto.CreatePaymentRequest;
 import com.bumbac.order.dto.PaymentDTO;
 import com.bumbac.order.service.PaymentService;
+import com.bumbac.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +28,7 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final UserService userService;
 
     @GetMapping
     @Operation(summary = "Получить платежи", description = "Возвращает все платежи или по конкретному заказу")
@@ -43,11 +49,17 @@ public class PaymentController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Платёж успешно создан"),
             @ApiResponse(responseCode = "400", description = "Ошибка запроса",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestBody(description = "Данные платежа", required = true,
-            content = @Content(schema = @Schema(implementation = CreatePaymentRequest.class)))
-    public PaymentDTO createPayment(@RequestBody CreatePaymentRequest request) {
-        return paymentService.create(request);
+
+    public PaymentDTO createPayment(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody CreatePaymentRequest body
+
+    ) {
+        User user = userDetails.getUser();
+             return paymentService.create(user, body);
     }
 }

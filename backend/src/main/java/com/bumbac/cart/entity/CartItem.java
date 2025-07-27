@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "cart_items")
 @Data
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class CartItem {
 
   @EmbeddedId
@@ -33,4 +31,13 @@ public class CartItem {
 
   @Column(name = "added_at")
   private LocalDateTime addedAt;
+
+  // ✳️ Конструктор без использования @Builder
+  public CartItem(CartItemId id, Cart cart, Color color, int quantity, LocalDateTime addedAt) {
+    this.id = id;
+    this.cart = cart;
+    this.color = color;
+    this.quantity = quantity;
+    this.addedAt = addedAt;
+  }
 }

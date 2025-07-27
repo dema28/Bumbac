@@ -40,11 +40,7 @@ public class JwtAuthenticationFilter extends GenericFilter {
                             .map(Role::getCode)
                             .collect(Collectors.toList());
 
-                    var userDetails = new UserDetailsImpl(
-                            user.getEmail(),
-                            user.getPasswordHash(),
-                            roleCodes
-                    );
+                    var userDetails = new UserDetailsImpl(user);
 
                     var authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -72,5 +68,4 @@ public class JwtAuthenticationFilter extends GenericFilter {
         """.formatted(http.getRequestURI()));
         }
     }
-
 }

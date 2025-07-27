@@ -8,7 +8,6 @@ import com.bumbac.common.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -16,6 +15,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 import java.util.List;
 
@@ -36,12 +37,12 @@ public class CartController {
             @ApiResponse(responseCode = "403", description = "Доступ запрещён",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestBody(description = "Данные для добавления товара", required = true,
-            content = @Content(schema = @Schema(implementation = AddToCartRequest.class)))
-    public ResponseEntity<?> addItem(HttpServletRequest request, @RequestBody AddToCartRequest dto) {
+    public ResponseEntity<?> addItem(HttpServletRequest request,
+                                     @RequestBody AddToCartRequest dto) {
         cartService.addItem(request, dto);
         return ResponseEntity.ok("Added to cart");
     }
+
 
     @PutMapping
     @Operation(summary = "Обновить товар в корзине", description = "Обновляет количество товара в корзине")
@@ -52,12 +53,14 @@ public class CartController {
             @ApiResponse(responseCode = "404", description = "Товар не найден в корзине",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestBody(description = "Данные для обновления товара", required = true,
-            content = @Content(schema = @Schema(implementation = UpdateCartRequest.class)))
-    public ResponseEntity<?> updateItem(HttpServletRequest request, @RequestBody UpdateCartRequest dto) {
+    public ResponseEntity<?> updateItem(
+            HttpServletRequest request,
+            @org.springframework.web.bind.annotation.RequestBody UpdateCartRequest dto
+    ) {
         cartService.updateItem(request, dto);
         return ResponseEntity.ok("Cart updated");
     }
+
 
     @GetMapping
     @Operation(summary = "Получить содержимое корзины", description = "Возвращает все товары в корзине пользователя")

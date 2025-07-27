@@ -3,6 +3,7 @@ package com.bumbac.user.service;
 import com.bumbac.auth.entity.User;
 import com.bumbac.auth.repository.UserRepository;
 import com.bumbac.auth.security.JwtService;
+import com.bumbac.order.service.PaymentService;
 import com.bumbac.user.dto.UpdateUserDto;
 import com.bumbac.user.dto.UserProfileRequest;
 import com.bumbac.user.dto.UserProfileResponse;

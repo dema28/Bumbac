@@ -10,7 +10,6 @@ import com.bumbac.common.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,8 +40,6 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Ошибка валидации",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestBody(description = "Данные нового пользователя", required = true,
-            content = @Content(schema = @Schema(implementation = RegisterRequest.class)))
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request,
                                       BindingResult result) {
         if (result.hasErrors()) {
@@ -77,8 +74,6 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Ошибка валидации",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestBody(description = "Данные для входа", required = true,
-            content = @Content(schema = @Schema(implementation = LoginRequest.class)))
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
                                    BindingResult result) {
         if (result.hasErrors()) {
@@ -113,8 +108,6 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "Refresh токен недействителен",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @RequestBody(description = "Refresh токен", required = true,
-            content = @Content(schema = @Schema(implementation = RefreshRequest.class)))
     public ResponseEntity<?> refresh(@RequestBody RefreshRequest request) {
         try {
             RefreshToken token = refreshTokenService.validate(request.getRefreshToken());
