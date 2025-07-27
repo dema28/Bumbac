@@ -27,36 +27,48 @@ public class CartService {
     public void addItem(HttpServletRequest request, AddToCartRequest dto) {
         String email = jwtService.extractUsernameFromHeader(request);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Color with ID " + dto.getColorId() + " not found"));
 
-        Cart cart = cartRepository.findByUserId(user.getId())
-                .orElseGet(() -> cartRepository.save(
-                        Cart.builder()
-                                .userId(user.getId())
-                                .createdAt(LocalDateTime.now())
-                                .updatedAt(LocalDateTime.now())
-                                .build()
-                ));
+
+        Cart foundCart = cartRepository.findByUserId(user.getId()).orElse(null);
+        Cart cartToUse;
+
+        if (foundCart == null) {
+            Cart newCart = new Cart();
+            newCart.setUserId(user.getId());
+            newCart.setCreatedAt(LocalDateTime.now());
+            newCart.setUpdatedAt(LocalDateTime.now());
+
+            cartToUse = cartRepository.saveAndFlush(newCart);
+            System.out.println("DEBUG >>> cart ID after save = " + cartToUse.getId());
+            System.out.println("DEBUG >>> saving new cart...");
+
+        } else {
+            cartToUse = foundCart;
+        }
+        System.out.println("DEBUG >>> requested colorId = " + dto.getColorId());
 
         Color color = colorRepository.findById(dto.getColorId())
                 .orElseThrow(() -> new RuntimeException("Color not found"));
 
-        CartItemId id = new CartItemId(cart.getId(), color.getId());
+        CartItemId id = new CartItemId(cartToUse.getId(), color.getId());
 
         CartItem item = cartItemRepository.findById(id)
                 .map(existing -> {
                     existing.setQuantity(existing.getQuantity() + dto.getQuantity());
                     return existing;
                 })
-                .orElseGet(() -> CartItem.builder()
-                        .id(id)
-                        .cart(cart)
-                        .color(color)
-                        .quantity(dto.getQuantity())
-                        .addedAt(LocalDateTime.now())
-                        .build());
+                .orElseGet(() -> new CartItem(
+                        id,
+                        cartToUse,
+                        color,
+                        dto.getQuantity(),
+                        LocalDateTime.now()
+                ));
 
         cartItemRepository.save(item);
+
+
     }
 
     public void updateItem(HttpServletRequest request, UpdateCartRequest dto) {

@@ -10,7 +10,7 @@ public class PaymentMapper {
     public PaymentDTO toDto(Payment p) {
         return PaymentDTO.builder()
                 .id(p.getId())
-                .orderId(p.getOrderId())
+                .orderId(p.getOrder().getId())
                 .status(p.getStatus().getCode())
                 .provider(p.getProvider())
                 .providerTxId(p.getProviderTxId())

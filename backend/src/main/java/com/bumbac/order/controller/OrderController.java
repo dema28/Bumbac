@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -38,8 +39,8 @@ public class OrderController {
     })
     public ResponseEntity<?> placeOrder(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.getCurrentUser(userDetails.getUsername());
-        orderService.placeOrder(user);
-        return ResponseEntity.ok("Order placed");
+        Order newOrder = orderService.placeOrder(user);
+        return ResponseEntity.ok(Map.of("orderId", newOrder.getId()));
     }
 
     @GetMapping

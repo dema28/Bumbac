@@ -11,12 +11,11 @@ import com.bumbac.order.entity.OrderItem;
 import com.bumbac.order.entity.OrderStatus;
 import com.bumbac.order.entity.Return;
 import com.bumbac.order.repository.OrderRepository;
+import com.bumbac.order.repository.ReturnRepository;
+import com.bumbac.order.mapper.ReturnMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.bumbac.order.repository.ReturnRepository;
-import com.bumbac.order.mapper.ReturnMapper;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,13 +29,11 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-
     private final ReturnRepository returnRepository;
     private final ReturnMapper returnMapper;
 
-
     @Transactional
-    public void placeOrder(User user) {
+    public Order placeOrder(User user) {
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
@@ -66,9 +63,10 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         order.setItems(items);
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
 
         cartItemRepository.deleteByCart(cart);
+        return savedOrder;
     }
 
     public List<Order> getUserOrders(User user) {
@@ -78,10 +76,10 @@ public class OrderService {
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
+
     public ReturnDTO getReturnById(Long id) {
         Return ret = returnRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Return not found"));
         return returnMapper.toDto(ret);
     }
-
 }
