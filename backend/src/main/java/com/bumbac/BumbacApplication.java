@@ -8,15 +8,16 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EntityScan(basePackages = {
-        "com.bumbac.auth.entity",      // 👤 Пользователи и роли
-        "com.bumbac.cart.entity",      // 🛒 Корзина и её элементы
-        "com.bumbac.catalog.entity",   // 🧶 Пряжа и цвета (Color → Yarn связь!)
-        "com.bumbac.order.entity",     // 📦 Заказы, платежи, возвраты
-        "com.bumbac.catalog.media", // 🖼️ Медиафайлы (изображения, видео и т.д.)
-        "com.bumbac.catalog.pattern", // 📖 Схемы вязания
-        "com.bumbac.user.entity",      // 👤 Профили пользователей
-        "com.bumbac.contact.entity", // 📞 Контакты пользователей
-        "com.bumbac.newsletter.entity" // 📰 Подписки на рассылки
+        "com.bumbac.modules.auth.entity",      // 👤 Пользователи и роли
+        "com.bumbac.modules.cart.entity",      // 🛒 Корзина и её элементы
+        "com.bumbac.modules.catalog.entity",   // 🧶 Пряжа и цвета (Color → Yarn связь!)
+        "com.bumbac.modules.order.entity",     // 📦 Заказы, платежи, возвраты
+        "com.bumbac.modules.media.entity", // 🖼️ Медиафайлы (изображения, видео и т.д.)
+        "com.bumbac.modules.pattern.entity", // 📖 Схемы вязания
+        "com.bumbac.modules.user.entity",      // 👤 Профили пользователей
+        "com.bumbac.modules.contact.entity", // 📞 Контакты пользователей
+        "com.bumbac.modules.newsletter.entity", // 📰 Подписки на рассылки
+        "com.bumbac.shared.entity" // 🛠️ Общие сущности (например, настройки, логи и т.д.)
         // 👉 добавляй другие пакеты, если появятся новые модули с @Entity
 })
 public class BumbacApplication {
