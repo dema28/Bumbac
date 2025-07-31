@@ -31,7 +31,6 @@ public class YarnService {
     private final CategoryRepository categoryRepository;
     private final CollectionRepository collectionRepository;
 
-
     public void create(YarnRequest request) {
         Brand brand = brandRepository.findById(request.getBrandId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Brand not found"));
@@ -45,13 +44,11 @@ public class YarnService {
         Yarn yarn = yarnMapper.toEntity(request);
         yarn.setBrand(brand);
         yarn.setCategory(category);
-        yarn.setCollection(collection); // ✅ добавлено
+        yarn.setCollection(collection);
         yarn.setCreatedAt(LocalDateTime.now());
 
         yarnRepository.save(yarn);
     }
-
-
 
     public List<YarnResponse> getAll() {
         return yarnRepository.findAll()
@@ -68,12 +65,7 @@ public class YarnService {
     }
 
     public List<YarnResponse> filter(String category, String brand, String material) {
-        Specification<Yarn> spec = Specification.where(null);
-
-        if (category != null) spec = spec.and(YarnSpecification.hasCategory(category));
-        if (brand != null) spec = spec.and(YarnSpecification.hasBrand(brand));
-        if (material != null) spec = spec.and(YarnSpecification.hasMaterial(material));
-
+        Specification<Yarn> spec = YarnSpecification.filterBy(category, brand, material);
         return yarnRepository.findAll(spec)
                 .stream()
                 .map(yarnMapper::toResponse)
