@@ -16,7 +16,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("*")); // Можно ограничить по необходимости
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedOrigins(List.of("https://qscfgrt657.duckdns.org", "http://localhost:3000", "http://localhost:5173")); // Только доверенные домены
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
