@@ -3,7 +3,6 @@ package com.bumbac.core.config;
 import com.bumbac.core.security.CustomAccessDeniedHandler;
 import com.bumbac.modules.auth.security.CustomUserDetailsService;
 import com.bumbac.modules.auth.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +21,6 @@ import org.springframework.security.config.Customizer;
 
 
 @Configuration
-@RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
