@@ -29,8 +29,15 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtFilter;
     private final CustomUserDetailsService userDetailsService;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-
-
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtFilter,
+            CustomUserDetailsService userDetailsService,
+            CustomAccessDeniedHandler accessDeniedHandler
+    ) {
+        this.jwtFilter = jwtFilter;
+        this.userDetailsService = userDetailsService;
+        this.accessDeniedHandler = accessDeniedHandler;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
