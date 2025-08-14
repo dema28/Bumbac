@@ -14,13 +14,21 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*")); // Можно ограничить по необходимости
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedOrigins(List.of("https://qscfgrt657.duckdns.org", "http://localhost:3000", "http://localhost:5173")); // Только доверенные домены
+        // Разрешаем наш домен по HTTPS
+        config.setAllowedOrigins(List.of(
+                "https://qscfgrt657.duckdns.org",
+                "http://qscfgrt657.duckdns.org",
+                "http://localhost:3000",
+                "http://localhost:5173"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
 }
