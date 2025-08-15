@@ -67,3 +67,6 @@ management:
       show-details: always
 
 
+server:
+  servlet:
+    context-path: /api

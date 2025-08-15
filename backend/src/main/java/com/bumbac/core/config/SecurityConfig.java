@@ -63,20 +63,20 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // ← ДОБАВЬ ЭТО
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/auth/**",
                                 "/swagger-ui/**",
                                 "/api-docs",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/api/newsletter/**",
-                                "/api/catalog/**",
-                                "/api/contact/**",
-                                "/api/yarns/**",
+                                "/newsletter/**",
+                                "/catalog/**",
+                                "/contact/**",
+                                "/yarns/**",
                                 "/actuator/health",
-                                "/actuator/info",
-                                "/actuator/prometheus"
+				"/actuator/health"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+			.requestMatchers("/actuator/metrics", "/actuator/prometheus", "/actuator/info", "/actuator/metrics", "/actuator/prometheus", "/actuator/info").hasRole("ADMIN")
+			.requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
