@@ -1,0 +1,32 @@
+name: 🚀 Self-Hosted CI/CD - Final
+
+on:
+  push:
+    branches: [ main, master, develop ]
+
+jobs:
+  deploy-self-hosted:
+    name: 🚀 Deploy on Self-Hosted Runner
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ☕ Build Backend
+        working-directory: ./backend
+        run: mvn clean package -DskipTests
+
+      - name: 🚀 Deploy Application
+        run: |
+          pkill -f "java.*app.jar" || true
+          sleep 5
+          mkdir -p /home/denis/apps/bumba
+c
+          cp -f backend/target/*.jar /home/denis/apps/bumbac/app.jar
+          cd /home/denis/apps/bumbac
+          nohup java -jar app.jar > app.log 2>&1 &
+          sleep 40
+          curl -f http://localhost:8080/actuator/health
+          echo "✅ Deployment complete!"
