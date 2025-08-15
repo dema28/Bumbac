@@ -111,3 +111,4 @@ GH_PROJECT_TOKEN=ghp_ваш_токен
 
 📘 Подробная документация по автоматизации:  
 [README_AUTOMATION.md](scripts/README_AUTOMATION.md)
+# Test Deploy Пт 15 авг 2025 18:58:46 CEST
