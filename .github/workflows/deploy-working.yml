@@ -1,0 +1,48 @@
+name: 🚀 Self-Hosted CI/CD - Working Version
+
+on:
+  push:
+    branches: [ main, master, develop ]
+
+jobs:
+  deploy-self-hosted:
+    name: 🚀 Deploy on Self-Hosted Runner
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ☕ Build Backend
+        working-directory: ./backend
+        run: |
+          echo "=== Building Backend ==="
+          mvn clean package -DskipTests -q
+
+      - name: 🛑 Stop Current Services
+        run: |
+          echo "=== Stopping current services ==="
+          pkill -f "spring-boot:run" || true
+          pkill -f "java.*app.jar" || true
+          sleep 5
+
+      - name: 🚀 Deploy Application
+        run: |
+          echo "=== Deploying ==="
+          mkdir -p /home/denis/apps/bumbac
+          cp -f backend/target/*.jar /home/denis/apps/bumbac/app.jar
+          
+          if [ -f "/home/denis/projects/Bumbac/backend/.env" ]; then
+            cp -f /home/denis/projects/Bumbac/backend/.env /home/denis/apps/bumbac/.env
+          fi
+          
+          cd /home/denis/apps/bumbac
+          nohup java -jar app.jar > app.log 2>&1 &
+          
+          echo "=== Waiting 60 seconds for startup ==="
+          sleep 60
+          
+          echo "=== Health check ==="
+          curl -f http://localhost:8080/api/actuator/health
+          echo "✅ Deployment complete!"
