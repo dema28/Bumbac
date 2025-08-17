@@ -1,45 +1,18 @@
+# 🔧 Development окружение - только вспомогательные сервисы
+# MySQL локальная, Backend запускается через Maven (screen сессия)
 
 services:
-  mysql:
-    image: mysql:8.0
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: yarn_store
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
   mailhog:
-    image: mailhog/mailhog
+    image: mailhog/mailhog:latest
     restart: unless-stopped
-    #ports:
-     # - "8025:8025"   # Web UI
-      #- "1025:1025"   # SMTP
+    ports:
+      - "8045:8025"   # Web UI
+      - "1025:1025"   # SMTP
 
   adminer:
-    image: adminer
+    image: adminer:latest
     restart: unless-stopped
-    # ports:
-      #- "8081:8080"
-    environment:
-      ADMINER_DEFAULT_SERVER: mysql
-
-  backend:
-    build: .
-    depends_on:
-      - mysql
-      - mailhog
     ports:
-      - "8080:8080"
-    env_file:
-      - .env
-    volumes:
-      - .:/app
+      - "8091:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-    restart: unless-stopped
-
-volumes:
-  mysql_data:
+      ADMINER_DEFAULT_SERVER: host.docker.internal
