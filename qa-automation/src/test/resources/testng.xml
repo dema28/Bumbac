@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="BumbacQASuite" verbose="1">
+    <test name="API Tests">
+        <classes>
+            <class name="com.bumbac.qa.api.AuthApiTest"/>
+        </classes>
+    </test>
+
+    <test name="UI Tests">
+        <classes>
+            <class name="com.bumbac.qa.ui.SwaggerUITest"/>
+        </classes>
+    </test>
+</suite>
