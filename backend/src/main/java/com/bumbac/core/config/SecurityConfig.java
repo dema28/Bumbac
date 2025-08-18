@@ -18,8 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 
-
-
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -27,6 +25,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtFilter;
     private final CustomUserDetailsService userDetailsService;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+
     public SecurityConfig(
             JwtAuthenticationFilter jwtFilter,
             CustomUserDetailsService userDetailsService,
@@ -40,43 +39,40 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // ← ВКЛЮЧАЕМ CORS
+                .cors(Customizer.withDefaults())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(403);
                             response.setContentType("application/json");
-                            response.getWriter().write("""
-            {
-              "status": 403,
-              "error": "Forbidden",
-              "message": "Authentication required",
-              "path": "%s"
-            }
-            """.formatted(request.getRequestURI()));
+                            response.getWriter().write("{\n" +
+                                    "  \"status\": 403,\n" +
+                                    "  \"error\": \"Forbidden\",\n" +
+                                    "  \"message\": \"Authentication required\",\n" +
+                                    "  \"path\": \"" + request.getRequestURI() + "\"\n" +
+                                    "}");
                         })
                         .accessDeniedHandler(accessDeniedHandler)
                 )
-
                 .userDetailsService(userDetailsService)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // ← ДОБАВЬ ЭТО
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
-                                "/auth/**",
+                                "/api/auth/**",        // ✅ ИСПРАВЛЕНО - добавлен префикс /api
                                 "/swagger-ui/**",
                                 "/api-docs",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/newsletter/**",
-                                "/catalog/**",
-                                "/contact/**",
-                                "/yarns/**",
+                                "/api/newsletter/**",  // ✅ ИСПРАВЛЕНО - добавлен префикс /api
+                                "/api/catalog/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
+                                "/api/contact/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
+                                "/api/yarns/**",       // ✅ ИСПРАВЛЕНО - добавлен префикс /api
                                 "/actuator/health",
-				"/actuator/health"
+                                "/actuator/info"
                         ).permitAll()
-			.requestMatchers("/actuator/metrics", "/actuator/prometheus", "/actuator/info", "/actuator/metrics", "/actuator/prometheus", "/actuator/info").hasRole("ADMIN")
-			.requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/actuator/metrics", "/actuator/prometheus").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
