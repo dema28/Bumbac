@@ -14,18 +14,21 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException {
+                       AccessDeniedException ex) throws IOException {
 
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        response.getWriter().write("""
-            {
-              "status": 403,
-              "error": "Forbidden",
-              "message": "Authentication required",
-              "path": "%s"
-            }
-            """.formatted(request.getRequestURI()));
+        String body = """
+        {
+          "status": 403,
+          "error": "Forbidden",
+          "message": "Access is denied",
+          "path": "%s"
+        }
+        """.formatted(request.getRequestURI());
+
+        response.getWriter().write(body);
     }
 }

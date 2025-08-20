@@ -1,69 +1,102 @@
 package com.bumbac.modules.auth.security;
 
-import com.bumbac.modules.auth.entity.Role;
+import com.bumbac.modules.auth.entity.User;
 import com.bumbac.modules.auth.repository.UserRepository;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends GenericFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws ServletException, IOException {
 
-        HttpServletRequest http = (HttpServletRequest) request;
-        HttpServletResponse httpResp = (HttpServletResponse) response;
+        // Пропускаем preflight
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String authHeader = request.getHeader("Authorization");
+
+        // 1) Нет Bearer — не аутентифицируем, отдаём дальше (на защищённых путях вернётся 401 из entryPoint)
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         try {
-            String email = jwtService.extractUsernameFromHeader(http);
-
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                var userOpt = userRepository.findByEmail(email);
-
-                if (userOpt.isPresent()) {
-                    var user = userOpt.get();
-
-                    var roleCodes = user.getRoles().stream()
-                            .map(Role::getCode)
-                            .collect(Collectors.toList());
-
-                    var userDetails = new UserDetailsImpl(user);
-
-                    var authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(http));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+            // 2) Пытаемся извлечь email из заголовка через твой сервис
+            String email = jwtService.extractUsernameFromHeader(request);
+            if (email == null || email.isBlank()) {
+                unauthorized(response, request.getRequestURI(), "Invalid token");
+                return;
             }
 
+            // Уже аутентифицирован — идём дальше
+            if (SecurityContextHolder.getContext().getAuthentication() != null) {
+                chain.doFilter(request, response);
+                return;
+            }
+
+            // 3) Подтверждаем пользователя в БД
+            User user = userRepository.findByEmail(email).orElse(null);
+            if (user == null) {
+                unauthorized(response, request.getRequestURI(), "Invalid token");
+                return;
+            }
+
+            // (Опционально для логов/метрик) — сохраняем roleCodes в атрибут запроса
+            List<String> roleCodes = user.getRoles().stream().map(r -> r.getCode()).collect(Collectors.toList());
+            request.setAttribute("roleCodes", roleCodes);
+
+            // 4) Создаём аутентификацию
+            var userDetails = new UserDetailsImpl(user);
+            var auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // 5) Всё ок — дальше по цепочке
             chain.doFilter(request, response);
 
         } catch (Exception ex) {
-            httpResp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            httpResp.setContentType("application/json");
-            httpResp.getWriter().write("{\n" +
-                    "  \"status\": 403,\n" +
-                    "  \"error\": \"Forbidden\",\n" +
-                    "  \"message\": \"Authentication required\",\n" +
-                    "  \"path\": \"" + http.getRequestURI() + "\"\n" +
-                    "}");
+            // Любая ошибка парсинга/валидности токена — 401
+            SecurityContextHolder.clearContext();
+            unauthorized(response, request.getRequestURI(), "Invalid or expired token");
         }
+    }
+
+    private void unauthorized(HttpServletResponse response, String path, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("WWW-Authenticate", "Bearer realm=\"api\"");
+        String body = """
+        {
+          "status": 401,
+          "error": "Unauthorized",
+          "message": "%s",
+          "path": "%s"
+        }
+        """.formatted(message, path);
+        response.getWriter().write(body);
     }
 }
