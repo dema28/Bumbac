@@ -58,14 +58,12 @@ public class JwtAuthenticationFilter extends GenericFilter {
         } catch (Exception ex) {
             httpResp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             httpResp.setContentType("application/json");
-            httpResp.getWriter().write("""
-        {
-          "status": 403,
-          "error": "Forbidden",
-          "message": "Authentication required",
-          "path": "%s"
-        }
-        """.formatted(http.getRequestURI()));
+            httpResp.getWriter().write("{\n" +
+                    "  \"status\": 403,\n" +
+                    "  \"error\": \"Forbidden\",\n" +
+                    "  \"message\": \"Authentication required\",\n" +
+                    "  \"path\": \"" + http.getRequestURI() + "\"\n" +
+                    "}");
         }
     }
 }

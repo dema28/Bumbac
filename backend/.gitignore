@@ -58,4 +58,3 @@ allure-results/
 allure-report/
 
 # Docker (локальные override-файлы)
-docker-compose.override.yml

@@ -45,3 +45,10 @@ allure-report/
 
 # Backup files
 *.zip
+
+# Backup files
+*.old
+*.backup
+*.bak
+*.save
+*.save.*

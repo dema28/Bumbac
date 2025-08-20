@@ -3,7 +3,6 @@ package com.bumbac.core.config;
 import com.bumbac.core.security.CustomAccessDeniedHandler;
 import com.bumbac.modules.auth.security.CustomUserDetailsService;
 import com.bumbac.modules.auth.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,10 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 
 @Configuration
-@RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
@@ -27,45 +26,52 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
-
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtFilter,
+            CustomUserDetailsService userDetailsService,
+            CustomAccessDeniedHandler accessDeniedHandler
+    ) {
+        this.jwtFilter = jwtFilter;
+        this.userDetailsService = userDetailsService;
+        this.accessDeniedHandler = accessDeniedHandler;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(403);
                             response.setContentType("application/json");
-                            response.getWriter().write("""
-            {
-              "status": 403,
-              "error": "Forbidden",
-              "message": "Authentication required",
-              "path": "%s"
-            }
-            """.formatted(request.getRequestURI()));
+                            response.getWriter().write("{\n" +
+                                    "  \"status\": 403,\n" +
+                                    "  \"error\": \"Forbidden\",\n" +
+                                    "  \"message\": \"Authentication required\",\n" +
+                                    "  \"path\": \"" + request.getRequestURI() + "\"\n" +
+                                    "}");
                         })
                         .accessDeniedHandler(accessDeniedHandler)
                 )
-
                 .userDetailsService(userDetailsService)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/api/auth/**",        // ✅ ИСПРАВЛЕНО - добавлен префикс /api
                                 "/swagger-ui/**",
                                 "/api-docs",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/api/newsletter/**",
-                                "/api/catalog/**",
-                                "/api/contact/**",
-                                "/api/yarns/**",
+                                "/api/newsletter/**",  // ✅ ИСПРАВЛЕНО - добавлен префикс /api
+                                "/api/catalog/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
+                                "/api/contact/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
+                                "/api/yarns/**",       // ✅ ИСПРАВЛЕНО - добавлен префикс /api
                                 "/actuator/health",
-                                "/actuator/info",
-                                "/actuator/prometheus"
+                                "/actuator/info"
                         ).permitAll()
+                        .requestMatchers("/actuator/metrics", "/actuator/prometheus").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
