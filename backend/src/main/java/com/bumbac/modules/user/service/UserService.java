@@ -9,10 +9,12 @@ import com.bumbac.modules.user.dto.UserProfileResponse;
 import com.bumbac.modules.user.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bumbac.core.exception.UserNotFoundException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class UserService {
 
     public User getCurrentUser(String username) {
         return userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     public void updateUserProfile(String username, UpdateUserDto dto) {
@@ -38,11 +40,26 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void changePassword(String username, String newPassword) {
+    public void changePassword(String username, String oldPassword, String newPassword) {
         User user = getCurrentUser(username);
-        user.setPasswordHash(passwordEncoder.encode(newPassword));
+
+        // NOTE: в сущности поле может называться password / passwordHash.
+        String currentHash = user.getPasswordHash(); // при необходимости замени на getPassword()
+
+        if (!passwordEncoder.matches(oldPassword, currentHash)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password is incorrect");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword)); // или setPassword(...)
         userRepository.save(user);
     }
+
+
+//    public void changePassword(String username, String newPassword) {
+//        User user = getCurrentUser(username);
+//        user.setPasswordHash(passwordEncoder.encode(newPassword));
+//        userRepository.save(user);
+//    }
 
     public UserProfileResponse getProfile(HttpServletRequest request) {
         String username = jwtService.extractUsernameFromHeader(request);

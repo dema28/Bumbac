@@ -3,6 +3,7 @@ package com.bumbac.core.config;
 import com.bumbac.core.security.CustomAccessDeniedHandler;
 import com.bumbac.modules.auth.security.CustomUserDetailsService;
 import com.bumbac.modules.auth.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,16 +43,23 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(403);
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
                             response.setContentType("application/json");
-                            response.getWriter().write("{\n" +
-                                    "  \"status\": 403,\n" +
-                                    "  \"error\": \"Forbidden\",\n" +
-                                    "  \"message\": \"Authentication required\",\n" +
-                                    "  \"path\": \"" + request.getRequestURI() + "\"\n" +
-                                    "}");
+                            response.setCharacterEncoding("UTF-8");
+                            response.setHeader("WWW-Authenticate", "Bearer realm=\"api\"");
+
+                            String body = """
+                            {
+                              "status": 401,
+                              "error": "Unauthorized",
+                              "message": "Authentication required",
+                              "path": "%s"
+                            }
+                            """.formatted(request.getRequestURI());
+
+                            response.getWriter().write(body);
                         })
-                        .accessDeniedHandler(accessDeniedHandler)
+                        .accessDeniedHandler(accessDeniedHandler) // 403 для «недостаточно прав»
                 )
                 .userDetailsService(userDetailsService)
                 .csrf(AbstractHttpConfigurer::disable)

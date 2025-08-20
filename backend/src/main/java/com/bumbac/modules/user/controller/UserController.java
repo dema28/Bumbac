@@ -2,16 +2,19 @@ package com.bumbac.modules.user.controller;
 
 import com.bumbac.modules.auth.entity.User;
 import com.bumbac.core.dto.ErrorResponse;
+import com.bumbac.modules.user.dto.ChangePasswordRequest;
 import com.bumbac.modules.user.dto.UpdateUserDto;
 import com.bumbac.modules.user.dto.UserProfileResponse;
 import com.bumbac.modules.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,26 +63,63 @@ public class UserController {
   @RequestBody(description = "Обновляемые данные пользователя", required = true,
           content = @Content(schema = @Schema(implementation = UpdateUserDto.class)))
   public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetails userDetails,
-                                         @RequestBody UpdateUserDto dto) {
+                                         @RequestBody @Valid UpdateUserDto dto) {
     userService.updateUserProfile(userDetails.getUsername(), dto);
     return ResponseEntity.ok("Profile updated");
   }
 
-  /**
-   * ✅ Смена пароля текущего пользователя
-   */
-  @Operation(summary = "Сменить пароль", description = "Позволяет текущему пользователю сменить свой пароль.")
-  @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Пароль успешно обновлён"),
-          @ApiResponse(responseCode = "400", description = "Некорректный пароль",
-                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-  })
-  @PutMapping("/password")
-  public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                          @RequestParam String newPassword) {
-    userService.changePassword(userDetails.getUsername(), newPassword);
-    return ResponseEntity.ok("Password updated");
-  }
+    /**
+     * ✅ Смена пароля текущего пользователя
+     */
+    @Operation(summary = "Сменить пароль", description = "Позволяет текущему пользователю сменить свой пароль.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Пароль успешно обновлён"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации или неверный старый пароль",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Требуется аутентификация",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/password")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Старый и новый пароли",
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = ChangePasswordRequest.class),
+                    examples = {
+                            @ExampleObject(
+                                    name = "valid",
+                                    value = "{\"oldPassword\":\"OldStrong1\",\"newPassword\":\"NewStrong1\"}"
+                            ),
+                            @ExampleObject(
+                                    name = "too-short",
+                                    value = "{\"oldPassword\":\"x\",\"newPassword\":\"Poke\"}"
+                            )
+                    }
+            )
+    )
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
+                                            @org.springframework.web.bind.annotation.RequestBody @jakarta.validation.Valid ChangePasswordRequest req) {
+        userService.changePassword(userDetails.getUsername(), req.oldPassword(), req.newPassword());
+        return ResponseEntity.ok("Password updated");
+    }
+
+
+
+//  /**
+//   * ✅ Смена пароля текущего пользователя
+//   */
+//  @Operation(summary = "Сменить пароль", description = "Позволяет текущему пользователю сменить свой пароль.")
+//  @ApiResponses({
+//          @ApiResponse(responseCode = "200", description = "Пароль успешно обновлён"),
+//          @ApiResponse(responseCode = "400", description = "Некорректный пароль",
+//                  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+//  })
+//  @PutMapping("/password")
+//  public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
+//                                          @RequestParam String newPassword) {
+//    userService.changePassword(userDetails.getUsername(), newPassword);
+//    return ResponseEntity.ok("Password updated");
+//  }
 
   /**
    * ✅ Получение всех пользователей (доступно только администратору)

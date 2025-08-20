@@ -6,6 +6,8 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.ToString;
 
 @Entity
 @Table(name = "users")
@@ -23,6 +25,8 @@ public class User {
   @Column(nullable = false, unique = true)
   private String email;
 
+  @JsonIgnore
+  @ToString.Exclude
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
 
