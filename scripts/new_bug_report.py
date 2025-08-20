@@ -7,12 +7,20 @@ def sanitize_filename(title):
     return slug
 
 def ask_steps(prompt):
-    steps_input = input(f"{prompt} (через ;): ").strip()
-    if ";" in steps_input:
-        steps = steps_input.split(";")
-    else:
-        steps = [steps_input]
-    return "\n".join([f"{i+1}. {step.strip()}" for i, step in enumerate(steps) if step.strip()])
+    raw = input(f"{prompt} (через ;): ").strip()
+    parts = [p.strip() for p in raw.split(";")] if ";" in raw else [raw]
+
+    cleaned = []
+    for p in parts:
+        if not p:
+            continue
+        # убрать один ведущий маркер списка
+        p = re.sub(r"^\s*(?:[-–—*•]|(?:\(?\s*(?:\d+|[ivxlcdm]+|[A-Za-z])\s*\)?[.)]?))\s+",
+                   "", p, flags=re.IGNORECASE)
+        if p:
+            cleaned.append(p)
+
+    return "\n".join(f"{i}. {text}" for i, text in enumerate(cleaned, start=1))
 
 def ask_links(prompt):
     print(f"{prompt} — Введите одну ссылку на строку (пустая строка — завершить):")
