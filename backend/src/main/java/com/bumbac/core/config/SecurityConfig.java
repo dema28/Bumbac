@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider; // ⬅️
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +37,15 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
         this.userDetailsService = userDetailsService;
         this.accessDeniedHandler = accessDeniedHandler;
+    }
+
+    // ✅ Явный провайдер аутентификации с твоим UserDetailsService и BCrypt
+    @Bean
+    public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService); // email -> UserDetailsImpl
+        provider.setPasswordEncoder(passwordEncoder);       // BCrypt сверка хэша
+        return provider;
     }
 
     @Bean
@@ -83,6 +94,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                // ⬇️ Регистрируем наш DaoAuthenticationProvider (иначе может взяться дефолтный без BCrypt)
+                .authenticationProvider(authenticationProvider(passwordEncoder()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
