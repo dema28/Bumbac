@@ -18,6 +18,7 @@ jobs:
         host: ${{ secrets.STAGING_HOST }}
         username: ${{ secrets.STAGING_USER }}
         key: ${{ secrets.STAGING_SSH_KEY }}
+	port: 2828
         script: |
           cd ~
           ./start-staging.sh
