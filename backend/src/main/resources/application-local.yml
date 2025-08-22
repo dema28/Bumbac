@@ -1,0 +1,83 @@
+jwt:
+  secret: local-development-secret-key-very-long-string-for-testing-purposes-only
+  expiration: 86400000
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3307/yarn_store_local
+    username: denis
+    password: local123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: localhost
+    port: 1026
+    username: 
+    password: 
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+  main:
+    allow-bean-definition-overriding: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    try-it-out-enabled: true
+  default-produces-media-type: application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+          - metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Настройки логирования для разработки
+logging:
+  level:
+    root: INFO
+    com.bumbac: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.boot: INFO
+  file:
+    name: logs/bumbac-local.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Настройки для локальной разработки  
+server:
+  port: 8080
+
+# CORS для локального фронтенда
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000
