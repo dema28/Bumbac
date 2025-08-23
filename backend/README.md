@@ -192,3 +192,4 @@ docker run --env-file .env -p 8080:8080 bumbac-backend
 
 Проект разрабатывается для сайта [https://bumbac](https://bumbac.md)  
 Если нашли баг или хотите помочь — welcome в issues и pull requests!
+// Test deployment pipeline 
