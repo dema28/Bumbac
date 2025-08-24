@@ -24,8 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/collections")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
-@SecurityRequirement(name = "bearerAuth")
 public class CollectionController {
 
     private final CollectionRepository collectionRepository;
@@ -52,6 +50,7 @@ public class CollectionController {
     })
     @RequestBody(description = "Данные новой коллекции", required = true,
             content = @Content(schema = @Schema(implementation = CollectionRequest.class)))
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CollectionResponse> create(@Valid @RequestBody CollectionRequest request) {
         Collection saved = collectionRepository.save(collectionMapper.toEntity(request));
         return ResponseEntity.ok(collectionMapper.toResponse(saved));
@@ -64,6 +63,7 @@ public class CollectionController {
             @ApiResponse(responseCode = "404", description = "Коллекция не найдена",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!collectionRepository.existsById(id)) {
             return ResponseEntity.notFound().build();

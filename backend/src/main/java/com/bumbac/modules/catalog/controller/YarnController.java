@@ -22,7 +22,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/yarns")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "bearerAuth")
 public class YarnController {
 
     private final YarnService yarnService;

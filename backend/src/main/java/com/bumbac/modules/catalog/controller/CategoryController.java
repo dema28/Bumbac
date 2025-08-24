@@ -24,8 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
-@SecurityRequirement(name = "bearerAuth")
 public class CategoryController {
 
     private final CategoryRepository categoryRepository;
@@ -52,6 +50,7 @@ public class CategoryController {
     })
     @RequestBody(description = "Данные новой категории", required = true,
             content = @Content(schema = @Schema(implementation = CategoryRequest.class)))
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
         Category saved = categoryRepository.save(categoryMapper.toEntity(request));
         return ResponseEntity.ok(categoryMapper.toResponse(saved));
@@ -64,6 +63,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Категория не найдена",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!categoryRepository.existsById(id)) {
             return ResponseEntity.notFound().build();

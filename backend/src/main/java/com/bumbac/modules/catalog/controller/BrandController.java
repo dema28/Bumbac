@@ -24,8 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/brands")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
-@SecurityRequirement(name = "bearerAuth")
 public class BrandController {
 
     private final BrandRepository brandRepository;
@@ -51,6 +49,7 @@ public class BrandController {
     })
     @RequestBody(description = "Данные нового бренда", required = true,
             content = @Content(schema = @Schema(implementation = BrandRequest.class)))
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<BrandResponse> create(@Valid @RequestBody BrandRequest request) {
         Brand saved = brandRepository.save(brandMapper.toEntity(request));
@@ -63,6 +62,7 @@ public class BrandController {
             @ApiResponse(responseCode = "404", description = "Бренд не найден",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!brandRepository.existsById(id)) {
