@@ -25,7 +25,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/contact")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "bearerAuth")
 public class ContactController {
 
     private final ContactService contactService;
