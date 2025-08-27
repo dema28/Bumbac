@@ -77,16 +77,24 @@ public class SecurityConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                // ✅ УБРАЛИ /api/ префикс - nginx его удаляет перед отправкой в Spring
+                                // ✅ API endpoints (Spring Boot получает БЕЗ /api префикса)
                                 "/auth/**",           // для /api/auth/**
-                                "/swagger-ui/**",     // для /api/swagger-ui/**
-                                "/api-docs",          // для /api/api-docs
-                                "/v3/api-docs/**",    // для /api/v3/api-docs/**
-                                "/swagger-ui.html",   // для /api/swagger-ui.html
                                 "/newsletter/**",     // для /api/newsletter/**
                                 "/catalog/**",        // для /api/catalog/**
                                 "/contact/**",        // для /api/contact/**
                                 "/yarns/**",          // для /api/yarns/**
+
+                                // ✅ Swagger UI (ВАЖНО: все пути для статики)
+                                "/swagger-ui/**",     // для /api/swagger-ui/**
+                                "/swagger-ui.html",   // для /api/swagger-ui.html
+                                "/swagger-resources/**", // дополнительные ресурсы
+                                "/webjars/**",        // ✅ КРИТИЧНО! статические файлы CSS/JS
+
+                                // ✅ OpenAPI документация
+                                "/v3/api-docs/**",    // для /api/v3/api-docs/**
+                                "/api-docs",          // дополнительно
+
+                                // ✅ Actuator endpoints
                                 "/actuator/health",   // для /api/actuator/health
                                 "/actuator/info",     // для /api/actuator/info
                                 "/actuator/prometheus" // для /api/actuator/prometheus
