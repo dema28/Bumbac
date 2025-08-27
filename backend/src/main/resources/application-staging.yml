@@ -46,8 +46,11 @@ spring:
 # Swagger UI конфигурация для staging
 springdoc:
   api-docs:
-    path: /v3/api-docs   # JSON спецификация
+    path: /v3/api-docs
   swagger-ui:
+    path: /swagger-ui.html    # ✅ Возвращаем путь!
+    config-url: /v3/api-docs/swagger-config
+    url: /v3/api-docs
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
