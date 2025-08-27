@@ -87,8 +87,8 @@ public class SecurityConfig {
                                 "/api/catalog/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
                                 "/api/contact/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
                                 "/api/yarns/**",       // ✅ ИСПРАВЛЕНО - добавлен префикс /api
-                                "/actuator/health",
-                                "/actuator/info"
+                                "/api/actuator/health",
+                                "/api/actuator/info"
                         ).permitAll()
                         .requestMatchers("/actuator/metrics", "/actuator/prometheus").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
