@@ -48,7 +48,6 @@ springdoc:
   api-docs:
     path: /v3/api-docs   # JSON спецификация
   swagger-ui:
-    path: /swagger-ui.html
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
