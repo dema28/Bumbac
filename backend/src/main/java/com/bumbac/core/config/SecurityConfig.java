@@ -76,22 +76,22 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
-                                "/api/auth/**",        // ✅ ИСПРАВЛЕНО - добавлен префикс /api
-                                "/swagger-ui/**",
-                                "/api-docs",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/api/newsletter/**",  // ✅ ИСПРАВЛЕНО - добавлен префикс /api
-                                "/api/catalog/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
-                                "/api/contact/**",     // ✅ ИСПРАВЛЕНО - добавлен префикс /api
-                                "/api/yarns/**",       // ✅ ИСПРАВЛЕНО - добавлен префикс /api
-                                "/api/actuator/health",
-                                "/api/actuator/info"
+                                // ✅ УБРАЛИ /api/ префикс - nginx его удаляет перед отправкой в Spring
+                                "/auth/**",           // для /api/auth/**
+                                "/swagger-ui/**",     // для /api/swagger-ui/**
+                                "/api-docs",          // для /api/api-docs
+                                "/v3/api-docs/**",    // для /api/v3/api-docs/**
+                                "/swagger-ui.html",   // для /api/swagger-ui.html
+                                "/newsletter/**",     // для /api/newsletter/**
+                                "/catalog/**",        // для /api/catalog/**
+                                "/contact/**",        // для /api/contact/**
+                                "/yarns/**",          // для /api/yarns/**
+                                "/actuator/health",   // для /api/actuator/health
+                                "/actuator/info",     // для /api/actuator/info
+                                "/actuator/prometheus" // для /api/actuator/prometheus
                         ).permitAll()
-                        .requestMatchers("/actuator/metrics", "/actuator/prometheus").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // для /api/admin/**
                         .anyRequest().authenticated()
                 )
                 // ⬇️ Регистрируем наш DaoAuthenticationProvider (иначе может взяться дефолтный без BCrypt)

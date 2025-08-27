@@ -18,7 +18,7 @@ public class RateLimiterConfig {
     public FilterRegistrationBean<Filter> rateLimiterRegistration() {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
         registration.setFilter(rateLimitFilter);
-        registration.addUrlPatterns("/api/auth/register"); // Только на регистрацию
+        registration.addUrlPatterns("/auth/register"); // Только на регистрацию
         registration.setOrder(0); // До Spring Security (важно!)
         return registration;
     }
@@ -27,7 +27,7 @@ public class RateLimiterConfig {
     public FilterRegistrationBean<Filter> loginRateLimiterRegistration(LoginRateLimitFilter loginFilter) {
         FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
         registration.setFilter(loginFilter);
-        registration.addUrlPatterns("/api/auth/login");
+        registration.addUrlPatterns("/auth/login");
         registration.setOrder(2); // чуть позже, чем регистрация
         return registration;
     }
