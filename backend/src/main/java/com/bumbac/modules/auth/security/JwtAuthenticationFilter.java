@@ -42,6 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return
                 // CORS preflight
                 "OPTIONS".equalsIgnoreCase(request.getMethod())
+                        // Auth endpoints
+                        || path.startsWith("/api/auth/")
                         // Swagger/OpenAPI
                         || path.startsWith("/v3/api-docs")
                         || path.startsWith("/swagger-ui")
