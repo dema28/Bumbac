@@ -45,11 +45,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-<<<<<<< Updated upstream
-    path: /swagger-ui.html
-=======
     path: /swagger-ui/
->>>>>>> Stashed changes
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
