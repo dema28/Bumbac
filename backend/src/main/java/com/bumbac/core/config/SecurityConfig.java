@@ -76,33 +76,44 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // CORS preflight
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Swagger + Actuator (health/info) — открыты
                         .requestMatchers(
-                                // ✅ API endpoints (Spring Boot получает БЕЗ /api префикса)
-                                "/auth/**",           // для /api/auth/**
-                                "/newsletter/**",     // для /api/newsletter/**
-                                "/catalog/**",        // для /api/catalog/**
-                                "/contact/**",        // для /api/contact/**
-                                "/yarns/**",          // для /api/yarns/**
-
-                                // ✅ Swagger UI (ВАЖНО: все пути для статики)
-                                "/swagger-ui/**",     // для /api/swagger-ui/**
-                                "/swagger-ui.html",   // для /api/swagger-ui.html
-                                "/swagger-resources/**", // дополнительные ресурсы
-                                "/webjars/**",        // ✅ КРИТИЧНО! статические файлы CSS/JS
-
-                                // ✅ OpenAPI документация
-                                "/v3/api-docs/**",    // для /api/v3/api-docs/**
-                                "/api-docs",          // дополнительно
-
-                                // ✅ Actuator endpoints
-                                "/actuator/health",   // для /api/actuator/health
-                                "/actuator/info",     // для /api/actuator/info
-                                "/actuator/prometheus" // для /api/actuator/prometheus
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/actuator/prometheus"
                         ).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // для /api/admin/**
+
+                        // Публичные GET каталога (контроллеры с /api, контекст-путь тоже /api → внутренний путь /api/…)
+                        .requestMatchers(org.springframework.http.HttpMethod.GET,
+                                "/api/yarns/**",
+                                "/api/categories/**",
+                                "/api/collections/**",
+                                "/api/brands/**",
+                                "/api/colors/**",
+                                "/api/patterns/**",
+                                "/api/media/**",
+                                "/api/shipments/methods"
+                        ).permitAll()
+
+                        // Аутентификация/рассылка/контакты — открыты
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/newsletter/**",
+                                "/api/contact/**"
+                        ).permitAll()
+
+                        // Всё остальное — по токену (ДОЛЖНО быть последним и в единственном числе)
                         .anyRequest().authenticated()
                 )
-                // ⬇️ Регистрируем наш DaoAuthenticationProvider (иначе может взяться дефолтный без BCrypt)
+                // Регистрируем наш DaoAuthenticationProvider (иначе может взяться дефолтный без BCrypt)
                 .authenticationProvider(authenticationProvider(passwordEncoder()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

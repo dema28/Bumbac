@@ -56,5 +56,10 @@ Thumbs.db
 # Allure reports
 allure-results/
 allure-report/
+backend/.env
+backend/.env.local
+backend/logs/
+backend/storage/
+
 
 # Docker (локальные override-файлы)

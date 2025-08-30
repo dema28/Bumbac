@@ -24,6 +24,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
+    /**
+     * ВАЖНО: здесь мы решаем, какие запросы вообще НЕ фильтровать.
+     * Мы отрезаем context-path (например, "/api"), чтобы матчить единообразно:
+     *  - /api/v3/api-docs  ->  /v3/api-docs
+     *  - /api/swagger-ui   ->  /swagger-ui
+     *  - /api/actuator/... ->  /actuator/...
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();     // полный путь, например: /api/v3/api-docs
+        String ctx  = request.getContextPath();    // контекст, например: /api
+        if (ctx != null && !ctx.isEmpty() && path.startsWith(ctx)) {
+            path = path.substring(ctx.length());   // теперь без контекста: /v3/api-docs
+        }
+
+        return
+                // CORS preflight
+                "OPTIONS".equalsIgnoreCase(request.getMethod())
+                        // Swagger/OpenAPI
+                        || path.startsWith("/v3/api-docs")
+                        || path.startsWith("/swagger-ui")
+                        || path.equals("/swagger-ui.html")
+                        || path.startsWith("/swagger-resources")
+                        || path.startsWith("/webjars")
+                        // Health (для LB/мониторинга)
+                        || path.startsWith("/actuator/health");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
