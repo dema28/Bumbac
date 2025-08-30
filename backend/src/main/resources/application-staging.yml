@@ -21,6 +21,7 @@ spring:
       hibernate:
         format_sql: false
 
+  # 📧 STAGING c Brevo (STARTTLS 587)
   mail:
     host: smtp-relay.brevo.com
     port: 587
@@ -37,23 +38,18 @@ spring:
           ssl:
             trust: smtp-relay.brevo.com
             protocols: TLSv1.2
-        from: ${MAIL_FROM}
+    default-encoding: UTF-8
 
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
-  main:
-    allow-bean-definition-overriding: true
-
-# Swagger UI конфигурация для staging
+# Swagger UI конфигурация для staging (совместимо с Nginx /swagger-ui/)
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
+<<<<<<< Updated upstream
     path: /swagger-ui.html
+=======
+    path: /swagger-ui/
+>>>>>>> Stashed changes
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
@@ -80,7 +76,7 @@ logging:
     com.bumbac: DEBUG
     org.springframework: INFO
     org.springframework.security: DEBUG
-    org.hibernate.SQL: false
+    org.hibernate.SQL: DEBUG       # ← включи для SQL в логах при отладке
 
 # CORS для staging фронтенда
 cors:
