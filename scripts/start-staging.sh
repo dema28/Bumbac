@@ -43,4 +43,4 @@ else
 fi
 
 echo "✅ STAGING поднят."
-bash "$(dirname "$0")/check-staging.sh"
+"$(dirname "$0")/check-staging.sh"
