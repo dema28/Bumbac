@@ -43,4 +43,4 @@ else
 fi
 
 echo "✅ STAGING поднят."
-./check-staging.sh  # Исправленный путь
+bash "$(dirname "$0")/check-staging.sh"
