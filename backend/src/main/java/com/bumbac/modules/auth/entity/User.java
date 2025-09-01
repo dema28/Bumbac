@@ -1,13 +1,15 @@
 package com.bumbac.modules.auth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.ToString;
+
+import com.bumbac.modules.user.entity.UserFavorite;
 
 @Entity
 @Table(name = "users")
@@ -16,42 +18,71 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "Пользователь системы")
 public class User {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Уникальный идентификатор пользователя", example = "1")
+    private Long id;
 
-  @Column(nullable = false, unique = true)
-  private String email;
+    @Column(nullable = false, unique = true)
+    @Schema(description = "Email пользователя", example = "user@example.com")
+    private String email;
 
-  @JsonIgnore
-  @ToString.Exclude
-  @Column(name = "password_hash", nullable = false)
-  private String passwordHash;
+    @JsonIgnore
+    @ToString.Exclude
+    @Column(name = "password_hash", nullable = false)
+    @Schema(description = "Хеш пароля пользователя", hidden = true)
+    private String passwordHash;
 
-  private String firstName;
-  private String lastName;
-  private String phone;
+    @Schema(description = "Имя пользователя", example = "John")
+    private String firstName;
 
-  private LocalDateTime createdAt;
+    @Schema(description = "Фамилия пользователя", example = "Doe")
+    private String lastName;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  private List<UserFavorite> favorites;
+    @Schema(description = "Номер телефона", example = "+37360123456")
+    private String phone;
 
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-          name = "user_roles",
-          joinColumns = @JoinColumn(name = "user_id"),
-          inverseJoinColumns = @JoinColumn(name = "role_id")
-  )
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  private Set<Role> roles;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Schema(description = "Дата создания аккаунта", example = "2024-01-15T10:30:00")
+    private LocalDateTime createdAt;
 
-  public List<String> getRoleCodes() {
-    return roles == null ? List.of() : roles.stream().map(Role::getCode).toList();
-  }
+    @Column(name = "updated_at", nullable = false)
+    @Schema(description = "Дата последнего обновления аккаунта", example = "2024-01-20T12:00:00")
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Schema(description = "Избранные товары пользователя", hidden = true)
+    private List<UserFavorite> favorites;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Schema(description = "Роли пользователя", hidden = true)
+    private Set<Role> roles;
+
+    public List<String> getRoleCodes() {
+        return roles == null ? List.of() : roles.stream().map(Role::getCode).toList();
+    }
+
+    @PrePersist
+    private void onCreate() {
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (updatedAt == null) updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

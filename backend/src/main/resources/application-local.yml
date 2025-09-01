@@ -1,39 +1,34 @@
-jwt:
-  secret: local-development-secret-key-very-long-string-for-testing-purposes-only
-  expiration: 86400000
-
 spring:
+  config:
+    import: optional:file:envs/local/.env
+
   datasource:
     url: jdbc:mysql://localhost:3307/yarn_store_local
     username: denis
-    password: local123
+    password: ${DB_PASSWORD:Himik28@good}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate # validate | update | create | create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
   mail:
-    host: smtp-relay.brevo.com
-    port: 587
-    username: ${BREVO_SMTP_USER}
-    password: ${BREVO_SMTP_KEY}
+    host: localhost
+    port: 2026
+    username: ""
+    password: ""
     protocol: smtp
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
-            required: true
-          ssl:
-            trust: smtp-relay.brevo.com
-            protocols: TLSv1.2
-        from: ${MAIL_FROM}
+            enable: false
 
   mvc:
     pathmatch:
@@ -43,6 +38,10 @@ spring:
       fail-on-empty-beans: false
   main:
     allow-bean-definition-overriding: true
+
+jwt:
+  secret: ${JWT_SECRET:local-development-secret-key-very-long-string-for-testing-purposes-only}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 springdoc:
   api-docs:
@@ -59,11 +58,7 @@ management:
   endpoints:
     web:
       exposure:
-        include:
-          - health
-          - info
-          - prometheus
-          - metrics
+        include: [health, info, prometheus, metrics]
   endpoint:
     health:
       show-details: always
@@ -88,14 +83,12 @@ server:
     include-exception: true
     include-stacktrace: always
 
-# CORS для локального фронтенда
 cors:
   allowed-origins: http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000
 
-# >>> ВАШИ прикладные настройки (вынесены на верхний уровень, НЕ внутри spring)
 app:
   url:
     base: http://localhost:8080
   mail:
-    from: ${MAIL_FROM}   # bumbac.md@gmail.com (верифицирован в Brevo)
+    from: ${MAIL_FROM:bumbac.md@gmail.com}
     reply-to: ""

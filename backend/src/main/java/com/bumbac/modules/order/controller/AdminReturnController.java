@@ -2,7 +2,6 @@ package com.bumbac.modules.order.controller;
 
 import com.bumbac.core.dto.ErrorResponse;
 import com.bumbac.modules.order.dto.ReturnDTO;
-import com.bumbac.modules.order.entity.ReturnStatus;
 import com.bumbac.modules.order.entity.ReturnStatusHistory;
 import com.bumbac.modules.order.service.ReturnService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +14,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import com.bumbac.shared.enums.ReturnStatus;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class AdminReturnController {
     })
     @RequestBody(description = "Новый статус возврата", required = true,
             content = @Content(schema = @Schema(implementation = ReturnStatus.class)))
-    public ReturnDTO updateReturnStatus(@PathVariable Long id, @RequestBody ReturnStatus status) {
+    public ReturnDTO updateStatus(@PathVariable Long id, @RequestParam ReturnStatus status) {
         return returnService.updateReturnStatus(id, status);
     }
 

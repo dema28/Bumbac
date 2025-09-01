@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -23,6 +24,13 @@ public class UserAdminDTO {
   @Schema(description = "Фамилия пользователя", example = "Novicov")
   private String lastName;
 
-  @Schema(description = "Список ролей пользователя", example = "[\"USER\", \"ADMIN\"]")
+  @Schema(description = "Телефон пользователя", example = "+37360123456")
+  private String phone;
+
+  @Schema(description = "Дата регистрации", example = "2024-01-15T10:30:00")
+  private LocalDateTime createdAt;
+
+  @Schema(description = "Список ролей пользователя", example = "[\"USER\", \"ADMIN\"]", allowableValues = { "USER",
+      "ADMIN", "MODERATOR" })
   private List<String> roles;
 }

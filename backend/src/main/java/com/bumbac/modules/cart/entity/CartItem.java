@@ -1,44 +1,65 @@
 package com.bumbac.modules.cart.entity;
 
-import com.bumbac.modules.user.entity.CartItemId;
+import com.bumbac.modules.cart.entity.CartItemId;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cart_items")
+@Table(name = "cart_items", indexes = {
+    @Index(name = "idx_cart_item_cart_id", columnList = "cart_id"),
+    @Index(name = "idx_cart_item_color_id", columnList = "color_id")
+})
 @Data
 @NoArgsConstructor
+@Schema(description = "Товар в корзине покупок")
 public class CartItem {
 
   @EmbeddedId
+  @Schema(description = "Составной ключ (cart_id + color_id)")
   private CartItemId id;
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("cartId")
-  @JoinColumn(name = "cart_id")
+  @JoinColumn(name = "cart_id", nullable = false)
+  @Schema(description = "Корзина, к которой принадлежит товар", hidden = true)
   private Cart cart;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("colorId")
-  @JoinColumn(name = "color_id")
+  @JoinColumn(name = "color_id", nullable = false)
+  @Schema(description = "Цвет/вариант товара")
   private Color color;
 
   @Column(nullable = false)
-  private int quantity;
+  @NotNull(message = "Количество не может быть null")
+  @Min(value = 1, message = "Количество должно быть больше 0")
+  @Schema(description = "Количество товара в корзине", example = "2", minimum = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+  private Integer quantity;
 
-  @Column(name = "added_at")
+  @Column(name = "added_at", nullable = false)
+  @Schema(description = "Дата и время добавления товара в корзину")
   private LocalDateTime addedAt;
 
-  // ✳️ Конструктор без использования @Builder
-  public CartItem(CartItemId id, Cart cart, Color color, int quantity, LocalDateTime addedAt) {
+  // Конструктор для создания нового товара в корзине
+  public CartItem(CartItemId id, Cart cart, Color color, Integer quantity, LocalDateTime addedAt) {
     this.id = id;
     this.cart = cart;
     this.color = color;
     this.quantity = quantity;
     this.addedAt = addedAt;
+  }
+
+  @PrePersist
+  protected void onCreate() {
+    if (addedAt == null) {
+      addedAt = LocalDateTime.now();
+    }
   }
 }

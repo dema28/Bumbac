@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,7 +25,8 @@ public class Collection {
 
     private String description;
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = false)
     @JsonManagedReference
-    private List<Yarn> yarns;
+    private List<Yarn> yarns = new ArrayList<>();
 }
