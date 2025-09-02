@@ -16,10 +16,12 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         // Разрешаем наш домен по HTTPS
         config.setAllowedOrigins(List.of(
-                "https://qscfgrt657.duckdns.org",
-                "http://qscfgrt657.duckdns.org",
-                "http://localhost:3000",
-                "http://localhost:5173"
+                "https://qscfgrt657.duckdns.org",                    // production
+                "http://qscfgrt657.duckdns.org",                     // production
+                "https://staging-qscfgrt657.duckdns.org",           // ✅ ДОБАВИТЬ staging
+                "http://staging-qscfgrt657.duckdns.org",            // ✅ ДОБАВИТЬ staging http
+                "http://localhost:3000",                             // local
+                "http://localhost:5173"                              // local dev
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));

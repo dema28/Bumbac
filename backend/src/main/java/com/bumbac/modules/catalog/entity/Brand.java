@@ -3,6 +3,9 @@ package com.bumbac.modules.catalog.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "brands")
 @Getter
@@ -22,4 +25,9 @@ public class Brand {
     private String country;
 
     private String website;
+
+    // 🔗 связь с Yarn
+    @Builder.Default
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Yarn> yarns = new ArrayList<>();
 }

@@ -17,6 +17,21 @@ spring:
       hibernate:
         format_sql: true
 
+  cache:
+    type: simple
+    cache-names:
+      - users
+      - roles
+      - carts
+      - cartItems
+      - colors
+      - yarns
+      - orders
+      - payments
+      - returns
+      - shipments
+      - favorites
+
   mail:
     host: smtp-relay.brevo.com
     port: 587
@@ -41,9 +56,37 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# Конфигурация медиафайлов
+app:
+  media:
+    upload-dir: ${MEDIA_UPLOAD_DIR:uploads/}
+    base-url: ${MEDIA_BASE_URL:http://localhost:8080/media/}
+    max-file-size: 10MB
+    allowed-formats: jpg,jpeg,png,gif,webp
+
+  # Конфигурация заказов
+  order:
+    default-status: NEW
+    max-items-per-order: 100
+    max-total-amount: 10000.00
+    auto-clear-cart: true
+
+  # Конфигурация безопасности и rate limiting
+  security:
+    rate-limit:
+      requests-per-minute: ${RATE_LIMIT_REQUESTS_PER_MINUTE:3}
+      burst-capacity: ${RATE_LIMIT_BURST_CAPACITY:5}
+      login-attempts-per-minute: ${RATE_LIMIT_LOGIN_ATTEMPTS_PER_MINUTE:5}
+      login-burst-capacity: ${RATE_LIMIT_LOGIN_BURST_CAPACITY:8}
+
 springdoc:
   api-docs:
-    path: /v3/api-docs   # JSON спецификация
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
@@ -52,21 +95,15 @@ springdoc:
     try-it-out-enabled: true
   default-produces-media-type: application/json
 
-
 management:
   endpoints:
     web:
       exposure:
-        include:
-          - health
-          - info
-          - prometheus
-          - metrics
+        include: [health, info, prometheus, metrics]
   endpoint:
     health:
       show-details: always
 
-# Настройки логирования
 logging:
   level:
     root: INFO

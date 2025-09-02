@@ -1,6 +1,6 @@
 package com.bumbac.modules.order.dto;
 
-import com.bumbac.modules.order.entity.ReturnStatus;
+import com.bumbac.shared.enums.ReturnStatus;
 import lombok.Builder;
 import lombok.Data;
 

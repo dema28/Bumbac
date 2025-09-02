@@ -29,12 +29,14 @@ public class PaymentService {
     private final PaymentMapper paymentMapper;
     private final OrderRepository orderRepository;
 
+    @Transactional(readOnly = true)
     public List<PaymentDTO> getAll() {
         return paymentRepository.findAll().stream()
                 .map(paymentMapper::toDto)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<PaymentDTO> getByOrderId(Long orderId) {
         return paymentRepository.findByOrderId(orderId).stream()
                 .map(paymentMapper::toDto)
@@ -43,76 +45,55 @@ public class PaymentService {
 
     /**
      * Создает платеж по заказу, который принадлежит переданному пользователю.
-     *
-     * @param user    пользователь, совершающий платёж
-     * @param request тело запроса с параметрами платежа
-     * @return созданный платеж
      */
     @Transactional
     public PaymentDTO create(User user, CreatePaymentRequest request) {
         Long userId = user.getId();
         Long orderId = request.getOrderId();
-        // Проверка, что пользователь и заказ не null
-        System.out.println(">>> AUTH USER ID = " + user.getId());
-        System.out.println(">>> REQUESTED ORDER ID = " + orderId);
 
-
-        // 1. Загружаем заказ с пользователем через JOIN FETCH
+        // 1) Загружаем заказ с пользователем
         Order order = orderRepository.findWithUserById(orderId, userId)
                 .orElseThrow(() -> new AccessDeniedException("Order not found or does not belong to current user"));
 
-        // 2. Получаем статус PENDING
+        // 2) Статус PENDING
         PaymentStatus status = paymentStatusRepository.findByCode("PENDING")
                 .orElseThrow(() -> new ResourceNotFoundException("Missing PENDING status"));
 
-        // 3. Проверка ID перед сохранением
-        if (order.getId() == null || status.getId() == null) {
-            throw new IllegalStateException("Order or PaymentStatus entity has null ID");
-        }
-
-        // 4. Логирование
-        System.out.println("DEBUG >>> Creating payment for orderId=" + orderId + ", userId=" + userId);
-
-        // 5. Создание платежа
+        // 3) Создание платежа (ВАЖНО: методы билдера — по именам полей entity)
         Payment payment = Payment.builder()
                 .order(order)
                 .status(status)
                 .provider(request.getProvider())
                 .providerTxId(request.getProviderTxId())
-                .amountMdl(request.getAmountMdl())
-                .amountUsd(request.getAmountUsd())
+                .amountMDL(request.getAmountMdl())   // <-- MDL в верхнем регистре
+                .amountUSD(request.getAmountUsd())   // <-- USD в верхнем регистре
                 .paidAt(LocalDateTime.now())
                 .build();
 
-        // 6. Сохраняем и возвращаем DTO
         return paymentMapper.toDto(paymentRepository.save(payment));
     }
 
     /**
      * Обрабатывает возврат средств по заказу.
-     *
-     * @param ret объект возврата с суммой и ID заказа
-     * @return созданный возвратный платёж
      */
-    @SuppressWarnings("unused")
+    @Transactional
     public PaymentDTO processRefund(Return ret) {
-        // Получаем сущность заказа по ID
-        Order order = orderRepository.findById(ret.getOrderId())
+        // Получаем заказ через ссылку из Return
+        Order order = orderRepository.findById(
+                        ret.getOrder() != null ? ret.getOrder().getId() : null
+                )
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        // Получаем статус REFUNDED
-        PaymentStatus refundedStatus = paymentStatusRepository
-                .findByCode("REFUNDED")
+        PaymentStatus refundedStatus = paymentStatusRepository.findByCode("REFUNDED")
                 .orElseThrow(() -> new ResourceNotFoundException("Missing REFUNDED status"));
 
-        // Создаём платёж на возврат
         Payment refund = Payment.builder()
-                .order(order)  // теперь передаём объект Order
-                .amountMdl(ret.getRefundAmountMdl())
-                .amountUsd(ret.getRefundAmountUsd())
+                .order(order)
                 .status(refundedStatus)
                 .provider("REFUND")
                 .paidAt(LocalDateTime.now())
+                .amountMDL(ret.getRefundAmountMDL())  // <-- точные геттеры из Return
+                .amountUSD(ret.getRefundAmountUSD())
                 .build();
 
         return paymentMapper.toDto(paymentRepository.save(refund));

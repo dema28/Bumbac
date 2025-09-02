@@ -2,8 +2,10 @@
 package com.bumbac.shared.enums;
 
 public enum ReturnStatus {
-    PENDING,
+    REQUESTED,  // из entity
+    PENDING,    // из shared
     APPROVED,
+    RECEIVED,   // из entity
     REJECTED,
-    REFUNDED
+    REFUNDED,
 }

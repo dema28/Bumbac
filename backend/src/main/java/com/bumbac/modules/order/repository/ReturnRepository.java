@@ -1,7 +1,7 @@
 package com.bumbac.modules.order.repository;
 
 import com.bumbac.modules.order.entity.Return;
-import com.bumbac.modules.order.entity.ReturnStatus;
+import com.bumbac.shared.enums.ReturnStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

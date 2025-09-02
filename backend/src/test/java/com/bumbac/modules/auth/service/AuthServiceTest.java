@@ -80,6 +80,18 @@ public class AuthServiceTest {
         Role userRole = Role.builder().id(1L).code("USER").name("User").build();
         when(roleRepository.findByCode("USER")).thenReturn(Optional.of(userRole));
 
+        // Мокаем сохранение пользователя
+        User savedUser = User.builder()
+                .id(1L)
+                .email(request.getEmail())
+                .passwordHash("hashedPassword")
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phone(request.getPhone())
+                .roles(Set.of(userRole))
+                .build();
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
         when(jwtService.generateToken(any(User.class))).thenReturn("mocked-access-token");
         when(refreshTokenService.create(any(User.class))).thenReturn(
                 RefreshToken.builder()
