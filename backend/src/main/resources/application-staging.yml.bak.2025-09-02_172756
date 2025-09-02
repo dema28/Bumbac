@@ -1,0 +1,235 @@
+server:
+  port: 8082
+
+# JWT Security
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/yarn_store_staging
+    username: denis
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  # 📧 STAGING c Brevo (STARTTLS 587)
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${BREVO_SMTP_USER}
+    password: ${BREVO_SMTP_KEY}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp-relay.brevo.com
+            protocols: TLSv1.2
+    default-encoding: UTF-8
+
+# Swagger UI конфигурация для staging (совместимо с Nginx /swagger-ui/)
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    try-it-out-enabled: true
+  default-produces-media-type: application/json
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - prometheus
+          - metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# Логирование
+logging:
+  level:
+    com.bumbac: DEBUG
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG       # ← включи для SQL в логах при отладке
+
+# CORS для staging фронтенда
+cors:
+  allowed-origins: https://staging-qscfgrt657.duckdns.org
+
+# Настройки приложения
+app:
+  url:
+    base: https://staging-qscfgrt657.duckdns.org
+  mail:
+    from: ${MAIL_FROM}
+    reply-to: ""
+server:
+  port: ${SERVER_PORT:8082}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:yarn_store_staging}
+    username: ${DB_USERNAME:denis}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${BREVO_SMTP_USER}
+    password: ${BREVO_SMTP_KEY}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp-relay.brevo.com
+            protocols: TLSv1.2
+    default-encoding: UTF-8
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    try-it-out-enabled: true
+  default-produces-media-type: application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [health, info, prometheus, metrics]
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    com.bumbac: DEBUG
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    # org.hibernate.SQL: DEBUG   # включай при отладке SQL
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://staging-qscfgrt657.duckdns.org}
+
+app:
+  url:
+    base: ${APP_BASE_URL:https://staging-qscfgrt657.duckdns.org}
+  mail:
+    from: ${MAIL_FROM}
+    reply-to: ""
+1~server:
+  port: ${SERVER_PORT:8082}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:yarn_store_staging}
+    username: ${DB_USERNAME:denis}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${BREVO_SMTP_USER}
+    password: ${BREVO_SMTP_KEY}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp-relay.brevo.com
+            protocols: TLSv1.2
+    default-encoding: UTF-8
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    try-it-out-enabled: true
+  default-produces-media-type: application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [health, info, prometheus, metrics]
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    com.bumbac: DEBUG
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    # org.hibernate.SQL: DEBUG   # включай при отладке SQL
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://staging-qscfgrt657.duckdns.org}
+
+app:
+  url:
+    base: ${APP_BASE_URL:https://staging-qscfgrt657.duckdns.org}
+  mail:
+    from: ${MAIL_FROM}
+    reply-to: ""
