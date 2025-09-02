@@ -104,10 +104,10 @@ FLUSH PRIVILEGES;
 
 ```bash
 # Копируем пример конфигурации
-cp .env.example .env
+cp .env.example.example .env.example
 
 # Открываем для редактирования
-nano .env  # или используйте любой текстовый редактор
+nano .env.example  # или используйте любой текстовый редактор
 ```
 
 #### Содержимое .env файла
@@ -207,7 +207,7 @@ java -jar target/bumbac-backend-1.0.0.jar
 docker build -t bumbac-backend .
 
 # Запуск контейнера
-docker run -p 8080:8080 --env-file .env bumbac-backend
+docker run -p 8080:8080 --env-file .env.example bumbac-backend
 ```
 
 ---

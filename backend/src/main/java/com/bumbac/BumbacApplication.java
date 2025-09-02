@@ -22,12 +22,12 @@ import org.springframework.context.annotation.ComponentScan;
 })
 public class BumbacApplication {
   public static void main(String[] args) {
-    // Загружаем переменные из .env, если файл существует
+    // Загружаем переменные из .env.example, если файл существует
     Dotenv dotenv = Dotenv.configure()
-        .ignoreIfMissing() // 📁 Не выбрасывать ошибку, если .env отсутствует (например, в проде)
+        .ignoreIfMissing() // 📁 Не выбрасывать ошибку, если .env.example отсутствует (например, в проде)
         .load();
 
-    // Переносим переменные из .env в системные свойства (Spring их увидит через
+    // Переносим переменные из .env.example в системные свойства (Spring их увидит через
     // @Value или конфиг)
     dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 
