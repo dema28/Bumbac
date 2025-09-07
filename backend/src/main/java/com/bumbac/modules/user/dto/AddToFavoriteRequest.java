@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Запрос на добавление в избранное")
+@Schema(description = "Запрос на добавление конкретного цвета пряжи в избранное")
 public class AddToFavoriteRequest {
 
-  @NotNull(message = "ID пряжи обязателен")
-  @Positive(message = "ID пряжи должен быть положительным числом")
-  @Schema(description = "ID пряжи для добавления в избранное", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
-  private Long yarnId;
+    @NotNull(message = "ID цвета обязателен")
+    @Positive(message = "ID цвета должен быть положительным числом")
+    @Schema(description = "ID конкретного цвета пряжи для добавления в избранное", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Long colorId;
 
-  @Size(max = 500, message = "Заметки не должны превышать 500 символов")
-  @Schema(description = "Заметки к избранному", example = "Хочу связать свитер")
-  private String notes;
+    @Size(max = 500, message = "Заметки не должны превышать 500 символов")
+    @Schema(description = "Заметки к избранному", example = "Хочу связать свитер из этого цвета")
+    private String notes;
 }

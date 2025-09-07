@@ -14,16 +14,19 @@ public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id") // 👈 ОБЯЗАТЕЛЬНО
     protected Long id;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false, nullable = false) // 👈 ОБЯЗАТЕЛЬНО
     protected LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false) // 👈 ОБЯЗАТЕЛЬНО
     protected LocalDateTime updatedAt;
 
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(); // ← тоже важно!
     }
 
     @PreUpdate
@@ -31,3 +34,4 @@ public abstract class BaseEntity {
         this.updatedAt = LocalDateTime.now();
     }
 }
+

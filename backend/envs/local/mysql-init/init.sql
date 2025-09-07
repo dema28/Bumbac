@@ -1,0 +1,3 @@
+CREATE USER IF NOT EXISTS 'denis'@'%' IDENTIFIED BY 'local123';
+GRANT ALL PRIVILEGES ON yarn_store_local.* TO 'denis'@'%';
+FLUSH PRIVILEGES;

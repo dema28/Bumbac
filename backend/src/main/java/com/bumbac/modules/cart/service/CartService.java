@@ -292,8 +292,9 @@ public class CartService {
         return existing;
     }
 
-    private CartItem createNewItem(CartItemId id, Cart cart, Color color, int quantity) {
-        CartItem newItem = new CartItem(id, cart, color, quantity, LocalDateTime.now());
+    private CartItem createNewItem(CartItemId id, Cart cart, Color color, Integer quantity) {
+        CartItem newItem = new CartItem(cart, color, quantity, LocalDateTime.now());
+        newItem.setId(id); // используем переданный id, а не создаем новый
         log.debug("Создан новый товар в корзине: colorId={}, quantity={}", color.getId(), quantity);
         return newItem;
     }
