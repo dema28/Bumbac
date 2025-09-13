@@ -16,15 +16,15 @@ public class SwaggerConfig {
   public OpenAPI openAPI() {
     return new OpenAPI()
         .info(new Info()
-            .title("Bumbac.md API")
+            .title("Yarn API")
             .description("Документация к API интернет-магазина пряжи. " +
                 "API предоставляет функциональность для управления каталогом, " +
                 "пользователями, заказами и другими аспектами интернет-магазина.")
             .version("1.0.0")
             .contact(new Contact()
-                .name("Bumbac.md Team")
-                .email("support@bumbac.md")
-                .url("https://bumbac.md"))
+                .name("Yarn.md Team")
+                .email("bumbac.md@gmail.com")
+                .url("https://qscfgrt657.duckdns.org/"))
             .license(new License()
                 .name("MIT License")
                 .url("https://opensource.org/licenses/MIT")))

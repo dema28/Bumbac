@@ -1,12 +1,13 @@
 package com.bumbac.modules.user.service;
 
-import com.bumbac.modules.catalog.entity.Yarn;
-import com.bumbac.modules.catalog.repository.YarnRepository;
+import com.bumbac.modules.cart.entity.Color;
+import com.bumbac.modules.cart.repository.ColorRepository;
 import com.bumbac.modules.user.dto.AddToFavoriteRequest;
 import com.bumbac.modules.user.dto.FavoriteDTO;
 import com.bumbac.modules.auth.entity.User;
 import com.bumbac.modules.auth.repository.UserRepository;
 import com.bumbac.modules.user.entity.UserFavorite;
+import com.bumbac.modules.user.entity.UserFavoriteId;
 import com.bumbac.modules.user.mapper.FavoriteMapper;
 import com.bumbac.modules.user.repository.FavoriteRepository;
 import io.micrometer.core.instrument.Counter;
@@ -27,7 +28,7 @@ public class FavoriteService {
 
     private final FavoriteRepository favoriteRepository;
     private final FavoriteMapper favoriteMapper;
-    private final YarnRepository yarnRepository;
+    private final ColorRepository colorRepository;
     private final UserRepository userRepository;
     private final MeterRegistry meterRegistry;
 
@@ -39,12 +40,12 @@ public class FavoriteService {
 
     public FavoriteService(FavoriteRepository favoriteRepository,
                            FavoriteMapper favoriteMapper,
-                           YarnRepository yarnRepository,
+                           ColorRepository colorRepository,
                            UserRepository userRepository,
                            MeterRegistry meterRegistry) {
         this.favoriteRepository = favoriteRepository;
         this.favoriteMapper = favoriteMapper;
-        this.yarnRepository = yarnRepository;
+        this.colorRepository = colorRepository;
         this.userRepository = userRepository;
         this.meterRegistry = meterRegistry;
 
@@ -74,7 +75,6 @@ public class FavoriteService {
                         return new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
                     });
 
-            // ✅ без пагинации — корректная сигнатура из репозитория
             List<UserFavorite> favorites = favoriteRepository.findByUserOrderByAddedAtDesc(user);
             List<FavoriteDTO> dtos = favoriteMapper.toDtoList(favorites);
 
@@ -93,8 +93,8 @@ public class FavoriteService {
     }
 
     @Transactional
-    public void addToFavorites(Long userId, Long yarnId) {
-        log.info("Добавление в избранное: userId={}, yarnId={}", userId, yarnId);
+    public void addToFavorites(Long userId, Long colorId) {
+        log.info("Добавление в избранное: userId={}, colorId={}", userId, colorId);
         try {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> {
@@ -103,35 +103,35 @@ public class FavoriteService {
                         return new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
                     });
 
-            Yarn yarn = yarnRepository.findById(yarnId)
+            Color color = colorRepository.findById(colorId)
                     .orElseThrow(() -> {
-                        log.warn("Пряжа не найдена: {}", yarnId);
+                        log.warn("Цвет не найден: {}", colorId);
                         favoritesErrorCounter.increment();
-                        return new ResponseStatusException(HttpStatus.NOT_FOUND, "Пряжа не найдена");
+                        return new ResponseStatusException(HttpStatus.NOT_FOUND, "Цвет пряжи не найден");
                     });
 
-            if (favoriteRepository.existsByUserIdAndYarnId(userId, yarnId)) {
-                log.warn("Товар уже в избранном: userId={}, yarnId={}", userId, yarnId);
+            if (favoriteRepository.existsByUserIdAndColorId(userId, colorId)) {
+                log.warn("Цвет уже в избранном: userId={}, colorId={}", userId, colorId);
                 favoritesErrorCounter.increment();
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Товар уже добавлен в избранное");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Цвет уже добавлен в избранное");
             }
 
-            // ✅ создаём обычную сущность без EmbeddedId
             UserFavorite favorite = new UserFavorite();
             favorite.setUser(user);
-            favorite.setYarn(yarn);
-            favorite.setAddedAt(LocalDateTime.now()); // у тебя поле есть в сущности
+            favorite.setColor(color);
+            favorite.setId(new UserFavoriteId(userId, colorId));
+            favorite.setAddedAt(LocalDateTime.now());
 
             favoriteRepository.save(favorite);
 
-            log.info("Товар добавлен в избранное: userId={}, yarnId={}", userId, yarnId);
+            log.info("Цвет добавлен в избранное: userId={}, colorId={}", userId, colorId);
             favoritesAddedCounter.increment();
 
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Ошибка при добавлении в избранное: userId={}, yarnId={}, error={}",
-                    userId, yarnId, e.getMessage(), e);
+            log.error("Ошибка при добавлении в избранное: userId={}, colorId={}, error={}",
+                    userId, colorId, e.getMessage(), e);
             favoritesErrorCounter.increment();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Внутренняя ошибка при добавлении в избранное");
@@ -140,12 +140,17 @@ public class FavoriteService {
 
     @Transactional
     public void addToFavorites(Long userId, AddToFavoriteRequest request) {
-        addToFavorites(userId, request.getYarnId());
+        addToFavorites(userId, request.getColorId());
+
+        // Если есть заметки, обновляем их
+        if (request.getNotes() != null && !request.getNotes().trim().isEmpty()) {
+            updateFavoriteNotes(userId, request.getColorId(), request.getNotes());
+        }
     }
 
     @Transactional
-    public void removeFromFavorites(Long userId, Long yarnId) {
-        log.info("Удаление из избранного: userId={}, yarnId={}", userId, yarnId);
+    public void removeFromFavorites(Long userId, Long colorId) {
+        log.info("Удаление из избранного: userId={}, colorId={}", userId, colorId);
         try {
             if (!userRepository.existsById(userId)) {
                 log.warn("Пользователь не найден: {}", userId);
@@ -153,28 +158,28 @@ public class FavoriteService {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
             }
 
-            if (!yarnRepository.existsById(yarnId)) {
-                log.warn("Пряжа не найдена: {}", yarnId);
+            if (!colorRepository.existsById(colorId)) {
+                log.warn("Цвет не найден: {}", colorId);
                 favoritesErrorCounter.increment();
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пряжа не найдена");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Цвет пряжи не найден");
             }
 
-            if (!favoriteRepository.existsByUserIdAndYarnId(userId, yarnId)) {
-                log.warn("Товар не найден в избранном: userId={}, yarnId={}", userId, yarnId);
+            if (!favoriteRepository.existsByUserIdAndColorId(userId, colorId)) {
+                log.warn("Цвет не найден в избранном: userId={}, colorId={}", userId, colorId);
                 favoritesErrorCounter.increment();
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Товар не найден в избранном");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Цвет не найден в избранном");
             }
 
-            favoriteRepository.deleteByUserIdAndYarnId(userId, yarnId);
+            favoriteRepository.deleteByUserIdAndColorId(userId, colorId);
 
-            log.info("Товар удален из избранного: userId={}, yarnId={}", userId, yarnId);
+            log.info("Цвет удален из избранного: userId={}, colorId={}", userId, colorId);
             favoritesRemovedCounter.increment();
 
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Ошибка при удалении из избранного: userId={}, yarnId={}, error={}",
-                    userId, yarnId, e.getMessage(), e);
+            log.error("Ошибка при удалении из избранного: userId={}, colorId={}, error={}",
+                    userId, colorId, e.getMessage(), e);
             favoritesErrorCounter.increment();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Внутренняя ошибка при удалении из избранного");
@@ -182,14 +187,14 @@ public class FavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isInFavorites(Long userId, Long yarnId) {
+    public boolean isInFavorites(Long userId, Long colorId) {
         try {
-            boolean exists = favoriteRepository.existsByUserIdAndYarnId(userId, yarnId);
-            log.debug("Проверка избранного: userId={}, yarnId={}, exists={}", userId, yarnId, exists);
+            boolean exists = favoriteRepository.existsByUserIdAndColorId(userId, colorId);
+            log.debug("Проверка избранного: userId={}, colorId={}, exists={}", userId, colorId, exists);
             return exists;
         } catch (Exception e) {
-            log.error("Ошибка при проверке избранного: userId={}, yarnId={}, error={}",
-                    userId, yarnId, e.getMessage(), e);
+            log.error("Ошибка при проверке избранного: userId={}, colorId={}, error={}",
+                    userId, colorId, e.getMessage(), e);
             return false;
         }
     }
@@ -207,27 +212,26 @@ public class FavoriteService {
     }
 
     @Transactional
-    public void updateFavoriteNotes(Long userId, Long yarnId, String notes) {
-        log.info("Обновление заметок в избранном: userId={}, yarnId={}", userId, yarnId);
+    public void updateFavoriteNotes(Long userId, Long colorId, String notes) {
+        log.info("Обновление заметок в избранном: userId={}, colorId={}", userId, colorId);
         try {
-            UserFavorite favorite = favoriteRepository.findByUserIdAndYarnId(userId, yarnId)
+            UserFavorite favorite = favoriteRepository.findByUserIdAndColorId(userId, colorId)
                     .orElseThrow(() -> {
-                        log.warn("Избранное не найдено: userId={}, yarnId={}", userId, yarnId);
+                        log.warn("Избранное не найдено: userId={}, colorId={}", userId, colorId);
                         favoritesErrorCounter.increment();
                         return new ResponseStatusException(HttpStatus.NOT_FOUND, "Избранное не найдено");
                     });
 
-            // У тебя в сущности уже есть поле notes — обновляем
             favorite.setNotes(notes);
             favoriteRepository.save(favorite);
 
-            log.info("Заметки обновлены в избранном: userId={}, yarnId={}", userId, yarnId);
+            log.info("Заметки обновлены в избранном: userId={}, colorId={}", userId, colorId);
 
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Ошибка при обновлении заметок: userId={}, yarnId={}, error={}",
-                    userId, yarnId, e.getMessage(), e);
+            log.error("Ошибка при обновлении заметок: userId={}, colorId={}, error={}",
+                    userId, colorId, e.getMessage(), e);
             favoritesErrorCounter.increment();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Внутренняя ошибка при обновлении заметок");

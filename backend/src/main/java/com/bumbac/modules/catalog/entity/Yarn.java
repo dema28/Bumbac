@@ -72,9 +72,9 @@ public class Yarn extends BaseEntity {
     @Schema(description = "Цена в долларах США", example = "2.25", requiredMode = Schema.RequiredMode.REQUIRED)
     private Double priceUSD;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @Schema(description = "Дата создания записи", example = "2023-10-01T10:30:00", accessMode = Schema.AccessMode.READ_ONLY)
-    private LocalDateTime createdAt;
+//    @Column(name = "created_at", nullable = false, updatable = false)
+//    @Schema(description = "Дата создания записи", example = "2023-10-01T10:30:00", accessMode = Schema.AccessMode.READ_ONLY)
+//    private LocalDateTime createdAt;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id", nullable = false)
@@ -95,13 +95,13 @@ public class Yarn extends BaseEntity {
     @Schema(description = "Категория пряжи", requiredMode = Schema.RequiredMode.REQUIRED)
     private Category category;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    @Schema(description = "Список избранных записей пользователей")
-    private List<UserFavorite> favorites = new ArrayList<>();
+//    @Builder.Default
+//    @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//    @JsonIgnore
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
+//    @Schema(description = "Список избранных записей пользователей")
+//    private List<UserFavorite> favorites = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "yarn", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -118,10 +118,10 @@ public class Yarn extends BaseEntity {
     @Schema(description = "Доступные цвета пряжи")
     private List<Color> colors = new ArrayList<>();
 
-    @PrePersist
-    public void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
+//    @PrePersist
+//    public void onCreate() {
+//        if (createdAt == null) {
+//            createdAt = LocalDateTime.now();
+//        }
+//    }
 }

@@ -25,6 +25,9 @@ public class Collection {
 
     private String description;
 
+    @Column(name = "brand_id", nullable = false)
+    private Long brandId;
+
     @Builder.Default
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = false)
     @JsonManagedReference

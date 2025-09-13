@@ -4,6 +4,8 @@ import com.bumbac.modules.auth.entity.User;
 import com.bumbac.modules.auth.repository.UserRepository;
 import com.bumbac.modules.auth.security.JwtService;
 import com.bumbac.modules.cart.dto.AddToCartRequest;
+import com.bumbac.modules.cart.dto.CartItemResponse;
+import com.bumbac.modules.cart.dto.CartResponse;
 import com.bumbac.modules.cart.dto.UpdateCartRequest;
 import com.bumbac.modules.cart.entity.Cart;
 import com.bumbac.modules.cart.entity.CartItem;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -80,7 +83,7 @@ public class CartService {
     }
 
     @Transactional
-    public void addItem(HttpServletRequest request, AddToCartRequest dto) {
+    public CartResponse addItem(HttpServletRequest request, AddToCartRequest dto) {
         log.info("Начало добавления товара в корзину: colorId={}, quantity={}", dto.getColorId(), dto.getQuantity());
 
         try {
@@ -95,6 +98,8 @@ public class CartService {
             log.info("Товар успешно добавлен в корзину: userId={}, colorId={}, quantity={}",
                     user.getId(), dto.getColorId(), dto.getQuantity());
 
+            return buildCartResponse(cart);
+
         } catch (ResponseStatusException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -105,8 +110,9 @@ public class CartService {
         }
     }
 
+
     @Transactional
-    public void updateItem(HttpServletRequest request, UpdateCartRequest dto) {
+    public CartResponse updateItem(HttpServletRequest request, UpdateCartRequest dto) {
         log.info("Начало обновления товара в корзине: colorId={}, quantity={}", dto.getColorId(), dto.getQuantity());
 
         try {
@@ -122,6 +128,8 @@ public class CartService {
 
             updateCartTimestamp(cart);
 
+            return buildCartResponse(cart);
+
         } catch (ResponseStatusException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -132,8 +140,9 @@ public class CartService {
         }
     }
 
+
     @Transactional(readOnly = true)
-    public List<CartItem> getItems(HttpServletRequest request) {
+    public CartResponse getItems(HttpServletRequest request) {
         log.debug("Получение содержимого корзины");
 
         try {
@@ -141,15 +150,41 @@ public class CartService {
             Cart cart = cartRepository.findByUserId(user.getId()).orElse(null);
 
             if (cart == null) {
-                log.info("Корзина не найдена для пользователя {}, возвращаем пустой список", user.getEmail());
+                log.info("Корзина не найдена для пользователя {}, возвращаем пустой CartResponse", user.getEmail());
                 cartsViewedCounter.increment();
-                return List.of();
+                return new CartResponse(user.getId(), List.of());
             }
 
-            List<CartItem> items = cartItemRepository.findByCart(cart);
+            List<CartItemResponse> items = cartItemRepository.findByCart(cart)
+                    .stream()
+                    .map(item -> {
+                        Color color = item.getColor();
+
+                        CartItemResponse dto = new CartItemResponse();
+                        dto.setColorId(color.getId());
+                        dto.setColorCode(color.getColorCode());
+                        dto.setColorName(color.getColorName());
+                        dto.setSku(color.getSku());
+                        dto.setHexValue(color.getHexValue());
+                        dto.setQuantity(item.getQuantity());
+                        dto.setUnitPrice(color.getPrice());
+                        dto.setTotalPrice(color.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                        dto.setStockQuantity(color.getStockQuantity());
+                        dto.setAddedAt(item.getAddedAt());
+
+                        if (color.getYarn() != null) {
+                            dto.setYarnId(color.getYarn().getId());
+                            dto.setYarnName(color.getYarn().getName());
+                        }
+
+                        return dto;
+                    })
+                    .toList();
+
             cartsViewedCounter.increment();
             log.info("Получено содержимое корзины: userId={}, itemsCount={}", user.getId(), items.size());
-            return items;
+
+            return new CartResponse(user.getId(), items);
 
         } catch (ResponseStatusException ex) {
             throw ex;
@@ -292,8 +327,9 @@ public class CartService {
         return existing;
     }
 
-    private CartItem createNewItem(CartItemId id, Cart cart, Color color, int quantity) {
-        CartItem newItem = new CartItem(id, cart, color, quantity, LocalDateTime.now());
+    private CartItem createNewItem(CartItemId id, Cart cart, Color color, Integer quantity) {
+        CartItem newItem = new CartItem(cart, color, quantity, LocalDateTime.now());
+        newItem.setId(id); // используем переданный id, а не создаем новый
         log.debug("Создан новый товар в корзине: colorId={}, quantity={}", color.getId(), quantity);
         return newItem;
     }
@@ -333,4 +369,35 @@ public class CartService {
         cart.setUpdatedAt(LocalDateTime.now());
         cartRepository.save(cart);
     }
+
+    private CartResponse buildCartResponse(Cart cart) {
+        List<CartItemResponse> items = cartItemRepository.findByCart(cart)
+                .stream()
+                .map(item -> {
+                    Color color = item.getColor();
+
+                    CartItemResponse dto = new CartItemResponse();
+                    dto.setColorId(color.getId());
+                    dto.setColorCode(color.getColorCode());
+                    dto.setColorName(color.getColorName());
+                    dto.setSku(color.getSku());
+                    dto.setHexValue(color.getHexValue());
+                    dto.setQuantity(item.getQuantity());
+                    dto.setUnitPrice(color.getPrice());
+                    dto.setTotalPrice(color.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                    dto.setStockQuantity(color.getStockQuantity());
+                    dto.setAddedAt(item.getAddedAt());
+
+                    if (color.getYarn() != null) {
+                        dto.setYarnId(color.getYarn().getId());
+                        dto.setYarnName(color.getYarn().getName());
+                    }
+
+                    return dto;
+                })
+                .toList();
+
+        return new CartResponse(cart.getUserId(), items);
+    }
+
 }

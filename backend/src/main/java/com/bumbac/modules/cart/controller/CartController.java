@@ -1,8 +1,8 @@
 package com.bumbac.modules.cart.controller;
 
 import com.bumbac.modules.cart.dto.AddToCartRequest;
+import com.bumbac.modules.cart.dto.CartResponse;
 import com.bumbac.modules.cart.dto.UpdateCartRequest;
-import com.bumbac.modules.cart.entity.CartItem;
 import com.bumbac.modules.cart.service.CartService;
 import com.bumbac.core.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -66,14 +65,10 @@ public class CartController {
     }
 
     try {
-      cartService.addItem(request, dto);
+      CartResponse response = cartService.addItem(request, dto);
       log.info("Товар успешно добавлен в корзину: colorId={}, quantity={}, IP={}",
           dto.getColorId(), dto.getQuantity(), clientIP);
-      return ResponseEntity.ok(Map.of(
-          "timestamp", LocalDateTime.now(),
-          "message", "Item added to cart successfully",
-          "colorId", dto.getColorId(),
-          "quantity", dto.getQuantity()));
+      return ResponseEntity.ok(response);
     } catch (ResponseStatusException ex) {
       log.error("Ошибка при добавлении товара в корзину: colorId={}, IP={}, error={}",
           dto.getColorId(), clientIP, ex.getReason());
@@ -124,16 +119,10 @@ public class CartController {
     }
 
     try {
-      cartService.updateItem(request, dto);
+      CartResponse response = cartService.updateItem(request, dto);
       log.info("Товар в корзине успешно обновлен: colorId={}, quantity={}, IP={}",
           dto.getColorId(), dto.getQuantity(), clientIP);
-
-      String action = dto.getQuantity() == 0 ? "removed from" : "updated in";
-      return ResponseEntity.ok(Map.of(
-          "timestamp", LocalDateTime.now(),
-          "message", "Item " + action + " cart successfully",
-          "colorId", dto.getColorId(),
-          "quantity", dto.getQuantity()));
+      return ResponseEntity.ok(response);
     } catch (ResponseStatusException ex) {
       log.error("Ошибка при обновлении товара в корзине: colorId={}, IP={}, error={}",
           dto.getColorId(), clientIP, ex.getReason());
@@ -156,9 +145,9 @@ public class CartController {
   }
 
   @GetMapping
-  @Operation(summary = "Получить содержимое корзины", description = "Возвращает все товары в корзине пользователя")
+  @Operation(summary = "Получить содержимое корзины", description = "Возвращает все товары в корзине пользователя с итоговой суммой")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Содержимое корзины получено", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CartItem.class))),
+      @ApiResponse(responseCode = "200", description = "Содержимое корзины получено", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CartResponse.class))),
       @ApiResponse(responseCode = "401", description = "Пользователь не аутентифицирован", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "404", description = "Корзина пользователя не найдена", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
@@ -167,9 +156,10 @@ public class CartController {
     log.debug("Запрос содержимого корзины с IP: {}", clientIP);
 
     try {
-      List<CartItem> items = cartService.getItems(request);
-      log.info("Содержимое корзины получено: {} товаров, IP={}", items.size(), clientIP);
-      return ResponseEntity.ok(items);
+      CartResponse response = cartService.getItems(request);
+      log.info("Содержимое корзины получено: {} товаров, IP={}",
+          response.getItems().size(), clientIP);
+      return ResponseEntity.ok(response);
     } catch (ResponseStatusException ex) {
       log.warn("Ошибка при получении корзины: IP={}, error={}", clientIP, ex.getReason());
       return ResponseEntity.status(ex.getStatusCode()).body(Map.of(

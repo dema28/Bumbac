@@ -1,12 +1,19 @@
 spring:
   config:
-    import: optional:file:envs/local/.env
+    import: optional:file:envs/local/.local.properties
 
   datasource:
     url: jdbc:mysql://localhost:3307/yarn_store_local
     username: denis
-    password: ${DB_PASSWORD:Himik28@good}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-description: "Init DB schema and seed"
+    baseline-version: 1
 
   jpa:
     hibernate:
@@ -65,13 +72,17 @@ management:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
     com.bumbac: DEBUG
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     org.springframework.boot: INFO
+    org.springframework.boot.env: TRACE
+    org.springframework.boot.context.config: TRACE
+
   file:
     name: logs/bumbac-local.log
+
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

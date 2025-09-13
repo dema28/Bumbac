@@ -281,8 +281,8 @@ CREATE DATABASE yarn_store CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 3. **Настройка переменных окружения**
    ```bash
-   cp .env.example.example .env.example
-   # Отредактируйте .env.example файл
+   cp .local.properties.example.example .local.properties.example
+   # Отредактируйте .local.properties.example файл
    ```
 
 4. **Запуск приложения**

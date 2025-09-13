@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -82,41 +82,65 @@ public class UserController {
   /**
    * Обновление профиля текущего пользователя
    */
-  @Operation(summary = "Обновить профиль", description = "Позволяет текущему пользователю обновить имя, фамилию, телефон и email.")
+  @Operation(
+          summary = "Обновить профиль",
+          description = "Позволяет текущему пользователю обновить имя, фамилию, телефон и email."
+  )
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Профиль успешно обновлён", content = @Content(schema = @Schema(implementation = Map.class), examples = @ExampleObject(value = "{\"message\": \"Profile updated successfully\"}"))),
-      @ApiResponse(responseCode = "400", description = "Ошибка валидации", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-      @ApiResponse(responseCode = "401", description = "Требуется аутентификация", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-      @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+          @ApiResponse(
+                  responseCode = "200",
+                  description = "Профиль успешно обновлён",
+                  content = @Content(
+                          schema = @Schema(implementation = Map.class),
+                          examples = @ExampleObject(value = "{\"message\": \"Profile updated successfully\"}")
+                  )
+          ),
+          @ApiResponse(
+                  responseCode = "400",
+                  description = "Ошибка валидации",
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+          ),
+          @ApiResponse(
+                  responseCode = "401",
+                  description = "Требуется аутентификация",
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+          ),
+          @ApiResponse(
+                  responseCode = "404",
+                  description = "Пользователь не найден",
+                  content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+          )
   })
   @PutMapping("/profile")
-  @RequestBody(description = "Обновляемые данные пользователя", required = true, content = @Content(schema = @Schema(implementation = UpdateUserDto.class)))
-  public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetails userDetails,
-      @RequestBody @Valid UpdateUserDto dto,
-      BindingResult bindingResult,
-      HttpServletRequest request) {
-    String clientIP = getClientIP(request);
-    log.info("Обновление профиля пользователя от IP: {}", clientIP);
+  public ResponseEntity<?> updateProfile(
+          @AuthenticationPrincipal UserDetails userDetails,
+          @org.springframework.web.bind.annotation.RequestBody @Valid UpdateUserDto dto,
+          BindingResult bindingResult,
+          HttpServletRequest request) {
 
-    if (bindingResult.hasErrors()) {
-      log.warn("Ошибки валидации при обновлении профиля: {}", bindingResult.getAllErrors());
-      return ResponseEntity.badRequest()
-          .body(Map.of("error", "Validation failed", "details", bindingResult.getAllErrors()));
-    }
+      String clientIP = getClientIP(request);
+      log.info("Обновление профиля пользователя от IP: {}", clientIP);
 
-    try {
-      userService.updateUserProfile(userDetails.getUsername(), dto);
-      log.info("Профиль пользователя обновлен: {}", userDetails.getUsername());
-      return ResponseEntity.ok(Map.of("message", "Profile updated successfully"));
+      if (bindingResult.hasErrors()) {
+          log.warn("Ошибки валидации при обновлении профиля: {}", bindingResult.getAllErrors());
+          return ResponseEntity.badRequest()
+                  .body(Map.of("error", "Validation failed", "details", bindingResult.getAllErrors()));
+      }
 
-    } catch (Exception e) {
-      log.error("Ошибка при обновлении профиля: {}", e.getMessage(), e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(Map.of("error", "Internal server error"));
-    }
+      try {
+          userService.updateUserProfile(userDetails.getUsername(), dto);
+          log.info("Профиль пользователя обновлен: {}", userDetails.getUsername());
+          return ResponseEntity.ok(Map.of("message", "Profile updated successfully"));
+
+      } catch (Exception e) {
+          log.error("Ошибка при обновлении профиля: {}", e.getMessage(), e);
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                  .body(Map.of("error", "Internal server error"));
+      }
   }
 
-  /**
+
+    /**
    * Смена пароля текущего пользователя
    */
   @Operation(summary = "Сменить пароль", description = "Позволяет текущему пользователю сменить свой пароль.")
