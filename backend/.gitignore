@@ -1,6 +1,20 @@
-# Java & Maven
+#######################################################
+# Bumbac Project - Universal .gitignore
+# Covers: Backend (Spring Boot + Maven), 
+#         Frontend (Nuxt + Node.js),
+#         QA Automation (Java/Python + Allure),
+#         Postman Collections,
+#         Docker & OS files
+#######################################################
+
+############################
+# Java & Maven (Backend)
+############################
 target/
 *.class
+*.jar
+*.war
+*.ear
 
 # Maven wrapper
 .mvn/
@@ -9,29 +23,88 @@ target/
 # Build systems
 build/
 
+# Test output
+test-output/
+
+############################
+# Backend Config & Runtime
+############################
 # Environment
 .env
 .env*
+backend/.env
+backend/.env.local
+backend/application-*.yml
 
 # Logs
-logs/
-*.log
+backend/logs/
+backend/*.log
+backend/*.pid
 
-# Test output (например, от TestNG)
-test-output/
+# Runtime storage
+backend/storage/
+backend/storage/messages/
+backend/storage/uploads/
+backend/storage/tmp/
 
+############################
+# Frontend (Nuxt / Node.js)
+############################
+node_modules/
+dist/
+.nuxt/
+.nitro/
+
+# Local envs
+.env.local
+.env.development
+.env.production
+
+# NPM/Yarn logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+############################
+# QA & Testing
+############################
+# Allure reports
+allure-results/
+allure-report/
+
+# Newman / Postman
+newman/
+reports/
+*.postman_collection.json
+*.postman_environment.json
+
+# Python QA scripts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+pip-log.txt
+pytest-cache/
+.mypy_cache/
+
+############################
 # IDEs & Editors
+############################
+# IntelliJ IDEA
 .idea/
 *.iws
 *.iml
 *.ipr
-.vscode/
-
-# IntelliJ config (избыточные)
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+
+# VSCode
+.vscode/
 
 # Eclipse
 .apt_generated
@@ -49,17 +122,19 @@ test-output/
 /nbdist/
 /.nb-gradle/
 
-# OS files
+############################
+# Docker
+############################
+docker-compose.override.yml
+docker-compose.local.yml
+volumes/
+*.pid
+*.seed
+*.db
+
+############################
+# OS Files
+############################
 .DS_Store
 Thumbs.db
-
-# Allure reports
-allure-results/
-allure-report/
-backend/.env
-backend/.env.local
-backend/logs/
-backend/storage/
-
-
-# Docker (локальные override-файлы)
+ehthumbs.db
