@@ -171,3 +171,4 @@ mysql -u username -p database_name < database-scripts/validate_db_code_alignment
 - ✅ Автоматизированные проверки соответствия
 
 Проект готов к дальнейшей разработке и развертыванию!
+

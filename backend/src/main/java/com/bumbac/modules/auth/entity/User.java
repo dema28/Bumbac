@@ -67,12 +67,16 @@ public class User {
   @Schema(description = "Избранные товары пользователя", hidden = true)
   private List<UserFavorite> favorites;
 
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @Schema(description = "Роли пользователя", hidden = true)
-  private Set<Role> roles;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Schema(description = "Роли пользователи", hidden = true)
+    private Set<Role> roles;
 
   public List<String> getRoleCodes() {
     return roles == null ? List.of() : roles.stream().map(Role::getCode).toList();

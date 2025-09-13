@@ -210,3 +210,4 @@ FROM payments;
 
 -- ====== 9. ФИНАЛЬНЫЙ РЕЗУЛЬТАТ ======
 SELECT '🎉 ПРОВЕРКА ЗАВЕРШЕНА!' as final_message;
+

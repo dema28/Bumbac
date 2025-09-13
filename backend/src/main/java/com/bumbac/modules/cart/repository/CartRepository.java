@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 
@@ -17,13 +18,14 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
   @Override
   @CacheEvict(value = { "carts", "cartItems" }, allEntries = true)
-  <S extends Cart> S save(S entity);
+  @NonNull
+  <S extends Cart> S save(@NonNull S entity);
 
   @Override
   @CacheEvict(value = { "carts", "cartItems" }, allEntries = true)
-  void delete(Cart entity);
+  void delete(@NonNull Cart entity);
 
   @Override
   @CacheEvict(value = { "carts", "cartItems" }, allEntries = true)
-  void deleteById(Long id);
+  void deleteById(@NonNull Long id);
 }

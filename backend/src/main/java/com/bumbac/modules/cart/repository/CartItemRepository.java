@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -27,13 +28,14 @@ public interface CartItemRepository extends JpaRepository<CartItem, CartItemId> 
 
   @Override
   @CacheEvict(value = { "cartItems", "carts" }, allEntries = true)
-  <S extends CartItem> S save(S entity);
+  @NonNull
+  <S extends CartItem> S save(@NonNull S entity);
 
   @Override
   @CacheEvict(value = { "cartItems", "carts" }, allEntries = true)
-  void delete(CartItem entity);
+  void delete(@NonNull CartItem entity);
 
   @Override
   @CacheEvict(value = { "cartItems", "carts" }, allEntries = true)
-  void deleteById(CartItemId id);
+  void deleteById(@NonNull CartItemId id);
 }
