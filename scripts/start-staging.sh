@@ -2,45 +2,71 @@
 set -e
 echo "🎭 Запуск STAGING..."
 
-# Обновляем develop ветки с обработкой изменений
+# Обновляем develop ветки
 cd ~/projects/staging/Bumbac-staging
-git stash 2>/dev/null || true
+git stash --quiet 2>/dev/null || true
 git fetch origin
 git checkout develop
 git pull --rebase origin develop
-git stash pop 2>/dev/null || true
+git stash pop --quiet 2>/dev/null || true
 
 cd ~/projects/staging/YearnBumbacFront-staging
-git stash 2>/dev/null || true
+git stash --quiet 2>/dev/null || true
 git fetch origin
 git checkout develop
 git pull --rebase origin develop
-git stash pop 2>/dev/null || true
+git stash pop --quiet 2>/dev/null || true
 
-# Останавливаем старые screen'ы
+# Останавливаем старые screen-сессии
 screen -X -S backend-staging quit 2>/dev/null || true
 screen -X -S frontend-staging quit 2>/dev/null || true
 
-# Backend (с проверкой .env.staging)
+# Backend
 echo "🔧 Backend..."
 cd ~/projects/staging/Bumbac-staging/backend
 if [ -f .env.staging ]; then
-    screen -dmS backend-staging bash -c 'cd ~/projects/staging/Bumbac-staging/backend && set -a && . .env.staging && set +a && mvn -q -DskipTests spring-boot:run -Dspring-boot.run.profiles=staging'
+    screen -dmS backend-staging bash -c '
+        cd ~/projects/staging/Bumbac-staging/backend
+        set -a && . .env.staging && set +a
+        mkdir -p logs
+        mvn -q -DskipTests spring-boot:run -Dspring-boot.run.profiles=staging | tee logs/staging_backend.log
+    '
 else
-    screen -dmS backend-staging bash -c 'cd ~/projects/staging/Bumbac-staging/backend && mvn -q -DskipTests spring-boot:run -Dspring-boot.run.profiles=staging'
+    screen -dmS backend-staging bash -c '
+        cd ~/projects/staging/Bumbac-staging/backend
+        mkdir -p logs
+        mvn -q -DskipTests spring-boot:run -Dspring-boot.run.profiles=staging | tee logs/staging_backend.log
+    '
 fi
 
 # Ждём старт Spring
-sleep 8
+sleep 20
 
-# Frontend (Nuxt dev)
+# Frontend
 echo "🎨 Frontend..."
 cd ~/projects/staging/YearnBumbacFront-staging
 if [ -f .env.staging ]; then
-    screen -dmS frontend-staging bash -c 'cd ~/projects/staging/YearnBumbacFront-staging && source .env.staging && npm i --silent && npm run dev -- --host 0.0.0.0 --port 3002'
+    screen -dmS frontend-staging bash -c '
+        cd ~/projects/staging/YearnBumbacFront-staging
+        source .env.staging
+        if [ ! -d node_modules ]; then
+            npm ci --silent
+        fi
+        npm run dev -- --host 0.0.0.0 --port 3002 | tee staging_frontend.log
+    '
 else
-    screen -dmS frontend-staging bash -c 'cd ~/projects/staging/YearnBumbacFront-staging && npm i --silent && npm run dev -- --host 0.0.0.0 --port 3002'
+    screen -dmS frontend-staging bash -c '
+        cd ~/projects/staging/YearnBumbacFront-staging
+        if [ ! -d node_modules ]; then
+            npm ci --silent
+        fi
+        npm run dev -- --host 0.0.0.0 --port 3002 | tee staging_frontend.log
+    '
 fi
 
 echo "✅ STAGING поднят."
-"$(dirname "$0")/check-staging.sh"
+
+echo ""
+echo "ℹ️ Для проверки состояния выполните вручную:"
+echo "   ./scripts/check-staging.sh"
+echo "   ./scripts/system_diagnosis_staging.sh"
