@@ -18,7 +18,7 @@ print_header() {
 
 # 1. ОБЩАЯ ИНФОРМАЦИЯ
 print_header "ИНФОРМАЦИЯ О СИСТЕМЕ"
-echo "OS: $(grep PRETTY_NAME /etc/os-release | cut -d'\"' -f2)"
+echo "OS: $(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '\"')"
 echo "Kernel: $(uname -r)"
 echo "Uptime: $(uptime -p)"
 echo "Load Average: $(uptime | awk -F'load average:' '{print $2}')"
@@ -82,14 +82,14 @@ fi
 
 # 7. MYSQL STAGING
 print_header "БАЗА ДАННЫХ MYSQL (STAGING)"
-if mysql -u denis -p'Himik28@good' -e "SELECT 1;" yarn_store_staging >/dev/null 2>&1; then
+if mysql -u denis --password=Himik28@good -e "SELECT 1;" yarn_store_staging >/dev/null 2>&1; then
     echo "✅ Подключение к yarn_store_staging успешно"
-    tables=$(mysql -u denis -p'Himik28@good' yarn_store_staging -e "SHOW TABLES;" | tail -n +2 | wc -l)
+    tables=$(mysql -u denis --password=Himik28@good yarn_store_staging -e "SHOW TABLES;" | tail -n +2 | wc -l)
     echo "📊 Таблиц: $tables"
-    echo "👤 Пользователей: $(mysql -u denis -p'Himik28@good' yarn_store_staging -e "SELECT COUNT(*) FROM users;" | tail -1)"
-    echo "🧵 Товаров (yarns): $(mysql -u denis -p'Himik28@good' yarn_store_staging -e "SELECT COUNT(*) FROM yarns;" | tail -1)"
-    echo "🛒 Корзин: $(mysql -u denis -p'Himik28@good' yarn_store_staging -e "SELECT COUNT(*) FROM cart_items;" | tail -1)"
-    echo "📦 Заказов: $(mysql -u denis -p'Himik28@good' yarn_store_staging -e "SELECT COUNT(*) FROM orders;" | tail -1)"
+    echo "👤 Пользователей: $(mysql -u denis --password=Himik28@good yarn_store_staging -e "SELECT COUNT(*) FROM users;" | tail -1)"
+    echo "🧵 Товаров (yarns): $(mysql -u denis --password=Himik28@good yarn_store_staging -e "SELECT COUNT(*) FROM yarns;" | tail -1)"
+    echo "🛒 Корзин: $(mysql -u denis --password=Himik28@good yarn_store_staging -e "SELECT COUNT(*) FROM cart_items;" | tail -1)"
+    echo "📦 Заказов: $(mysql -u denis --password=Himik28@good yarn_store_staging -e "SELECT COUNT(*) FROM orders;" | tail -1)"
 else
     echo "❌ Ошибка подключения к yarn_store_staging"
 fi
@@ -97,15 +97,14 @@ fi
 # 8. API ЭНДПОИНТЫ
 print_header "API ЭНДПОИНТЫ (STAGING)"
 endpoints=(
-    "http://localhost:8082/actuator/health:Backend Health Local"
-    "http://localhost:3002:Frontend Local"
-    "https://staging-qscfgrt657.duckdns.org/actuator/health:Backend Health Nginx"
-    "https://staging-qscfgrt657.duckdns.org/v3/api-docs:API Docs"
-    "https://staging-qscfgrt657.duckdns.org/swagger-ui/index.html:Swagger UI"
+  "http://localhost:8082/actuator/health|Backend Health Local"
+  "http://localhost:3002|Frontend Local"
+  "https://staging-qscfgrt657.duckdns.org/actuator/health|Backend Health Nginx"
+  "https://staging-qscfgrt657.duckdns.org/v3/api-docs|API Docs"
+  "https://staging-qscfgrt657.duckdns.org/swagger-ui/index.html|Swagger UI"
 )
 for ep in "${endpoints[@]}"; do
-    url=$(echo "$ep" | cut -d':' -f1-2)
-    name=$(echo "$ep" | cut -d':' -f3-)
+    IFS="|" read -r url name <<< "$ep"
     code=$(curl -s -o /dev/null -w "%{http_code}" "$url" --connect-timeout 5)
     if [ "$code" = "200" ]; then
         echo "✅ $name ($url) - OK"
@@ -135,8 +134,8 @@ done
 
 # 10. СИСТЕМНЫЕ РЕСУРСЫ
 print_header "СИСТЕМНЫЕ РЕСУРСЫ"
-top -bn1 | grep "Cpu(s)" | awk '{printf "CPU: %.1f%% загружен\n", $2}'
-free -h | awk '/Mem/ {printf "RAM: %s из %s использовано\n", $3, $2}'
+top -bn1 | grep "Cpu(s)" | awk '{printf "CPU: %.1f%% загружен\n", 100 - $8}'
+free -h | awk '/Mem/ {printf "RAM: %s из %s (%.1f%%)\n", $3, $2, $3/$2*100}'
 echo "Top процессы по CPU:"
 ps aux --sort=-%cpu | head -6 | tail -5 | awk '{printf "%-10s %s%% %s\n", $1, $3, $11}'
 echo "Top процессы по памяти:"
@@ -188,11 +187,11 @@ fi
 # 13. СРАВНЕНИЕ PROD vs STAGING (ВСЕ ТАБЛИЦЫ)
 print_header "СРАВНЕНИЕ PROD vs STAGING"
 
-if mysql -u denis -p'Himik28@good' -e "SELECT 1;" yarn_store >/dev/null 2>&1 && \
-   mysql -u denis -p'Himik28@good' -e "SELECT 1;" yarn_store_staging >/dev/null 2>&1; then
+if mysql -u denis --password=Himik28@good -e "SELECT 1;" yarn_store >/dev/null 2>&1 && \
+   mysql -u denis --password=Himik28@good -e "SELECT 1;" yarn_store_staging >/dev/null 2>&1; then
 
-    prod_tables=$(mysql -u denis -p'Himik28@good' yarn_store -e "SHOW TABLES;" | tail -n +2)
-    staging_tables=$(mysql -u denis -p'Himik28@good' yarn_store_staging -e "SHOW TABLES;" | tail -n +2)
+    prod_tables=$(mysql -u denis --password=Himik28@good yarn_store -e "SHOW TABLES;" | tail -n +2)
+    staging_tables=$(mysql -u denis --password=Himik28@good yarn_store_staging -e "SHOW TABLES;" | tail -n +2)
 
     prod_count=$(echo "$prod_tables" | wc -l)
     staging_count=$(echo "$staging_tables" | wc -l)
@@ -211,8 +210,8 @@ if mysql -u denis -p'Himik28@good' -e "SELECT 1;" yarn_store >/dev/null 2>&1 && 
     echo ""
     echo "📋 Сравнение количества строк в таблицах:"
     for table in $prod_tables; do
-        prod_rows=$(mysql -u denis -p'Himik28@good' yarn_store -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
-        staging_rows=$(mysql -u denis -p'Himik28@good' yarn_store_staging -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
+        prod_rows=$(mysql -u denis --password=Himik28@good yarn_store -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
+        staging_rows=$(mysql -u denis --password=Himik28@good yarn_store_staging -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
 
         if [ -n "$prod_rows" ] && [ -n "$staging_rows" ]; then
             if [ "$prod_rows" -eq "$staging_rows" ]; then
