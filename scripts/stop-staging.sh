@@ -11,6 +11,6 @@ sudo lsof -ti:3002 | xargs kill -9 2>/dev/null || true
 
 # Убиваем процессы по имени
 pkill -f "spring-boot:run" 2>/dev/null || true
-pkill -f "npm run dev" 2>/dev/null || true
+pkill -f "node .output/server/index.mjs" 2>/dev/null || true
 
 echo "✅ Остановлено."
