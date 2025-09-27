@@ -16,13 +16,13 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.url.base}")
+    @Value("${APP_URL_BASE}")
     private String baseUrl;
 
-    @Value("${app.mail.from}")
+    @Value("${MAIL_FROM}")
     private String fromEmail;
 
-    @Value("${app.mail.reply-to:}")
+    @Value("${{MAIL_REPLY_TO:}")
     private String replyTo; // опционально
 
     public void sendConfirmationEmail(NewsletterSubscriber subscriber) {
