@@ -7,9 +7,11 @@ import com.bumbac.modules.auth.dto.RegisterRequest;
 import com.bumbac.modules.auth.entity.RefreshToken;
 import com.bumbac.modules.auth.entity.Role;
 import com.bumbac.modules.auth.entity.User;
+import com.bumbac.modules.auth.repository.EmailVerificationTokenRepository;
 import com.bumbac.modules.auth.repository.RoleRepository;
 import com.bumbac.modules.auth.repository.UserRepository;
 import com.bumbac.modules.auth.security.JwtService;
+import com.bumbac.modules.email.EmailService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -48,6 +50,12 @@ public class AuthServiceTest {
     private RefreshTokenService refreshTokenService;
 
     private AuthService authService;
+    @Mock
+    private EmailVerificationTokenRepository tokenRepository;
+
+    @Mock
+    private EmailService emailService;
+
 
 
     @BeforeMethod
@@ -59,7 +67,9 @@ public class AuthServiceTest {
                 jwtService,
                 authManager,             // ✅ authManager — 4-й
                 roleRepository,          // ✅ roleRepository — 5-й
-                refreshTokenService      // ✅ refreshTokenService — 6-й
+                refreshTokenService,      // ✅ refreshTokenService — 6-й
+                tokenRepository,
+                emailService
         );
     }
 
