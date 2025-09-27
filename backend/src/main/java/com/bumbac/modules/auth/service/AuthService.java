@@ -5,9 +5,12 @@ import com.bumbac.modules.auth.dto.LoginRequest;
 import com.bumbac.modules.auth.dto.RegisterRequest;
 import com.bumbac.modules.auth.entity.Role;
 import com.bumbac.modules.auth.entity.User;
+import com.bumbac.modules.auth.entity.EmailVerificationToken;
+import com.bumbac.modules.auth.repository.EmailVerificationTokenRepository;
 import com.bumbac.modules.auth.repository.RoleRepository;
 import com.bumbac.modules.auth.repository.UserRepository;
 import com.bumbac.modules.auth.security.JwtService;
+import com.bumbac.modules.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,123 +23,136 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
 
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
-  private final JwtService jwtService;
-  private final AuthenticationManager authManager;
-  private final RoleRepository roleRepository;
-  private final RefreshTokenService refreshTokenService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authManager;
+    private final RoleRepository roleRepository;
+    private final RefreshTokenService refreshTokenService;
+    private final EmailVerificationTokenRepository tokenRepository;
+    private final EmailService emailService;
 
-  @Transactional
-  public AuthResponse register(RegisterRequest request) {
-    log.info("Начало процесса регистрации для email: {}", request.getEmail());
+    @Transactional
+    public AuthResponse register(RegisterRequest request) {
+        log.info("Начало процесса регистрации для email: {}", request.getEmail());
 
-    // Проверка существования email
-    if (userRepository.existsByEmail(request.getEmail())) {
-      log.warn("Попытка регистрации с уже существующим email: {}", request.getEmail());
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
+        }
+
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Phone already in use. Would you like to restore your account?");
+        }
+
+        Role userRole = roleRepository.findByCode("USER")
+                .orElseThrow(() -> new RuntimeException("Default role USER not found"));
+
+        try {
+            User user = User.builder()
+                    .email(request.getEmail().toLowerCase().trim())
+                    .passwordHash(passwordEncoder.encode(request.getPassword()))
+                    .firstName(request.getFirstName().trim())
+                    .lastName(request.getLastName().trim())
+                    .phone(request.getPhone().trim())
+                    .roles(Set.of(userRole))
+                    .createdAt(LocalDateTime.now())
+                    .emailVerified(false) // 🚨 новый пользователь ещё не подтвержден
+                    .build();
+
+            User savedUser = userRepository.save(user);
+
+            // Генерация и сохранение токена подтверждения
+            String token = UUID.randomUUID().toString();
+            EmailVerificationToken verificationToken = new EmailVerificationToken(
+                    token,
+                    LocalDateTime.now().plusHours(24),
+                    savedUser
+            );
+            tokenRepository.save(verificationToken);
+
+
+            // Отправка письма
+            String verificationUrl = "https://qscfgrt657.duckdns.org/api/auth/verify?token=" + token;
+            emailService.sendEmail(
+                    savedUser.getEmail(),
+                    "Подтверждение email для Bumbac.md",
+                    "Здравствуйте, " + savedUser.getFirstName() + "!\n\n" +
+                            "Пожалуйста, подтвердите ваш email, перейдя по ссылке:\n" +
+                            verificationUrl + "\n\n" +
+                            "Срок действия ссылки: 24 часа."
+            );
+
+            log.info("Пользователь {} зарегистрирован. Email подтверждение отправлено.", savedUser.getEmail());
+
+            // 🚨 Токены не выдаем пока email не подтвержден
+            return new AuthResponse(null, null);
+
+        } catch (Exception e) {
+            log.error("Ошибка при создании пользователя {}: {}", request.getEmail(), e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create user");
+        }
     }
 
-    // Проверка существования телефона
-    if (userRepository.existsByPhone(request.getPhone())) {
-      log.warn("Попытка регистрации с уже существующим телефоном: {}", request.getPhone());
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT,
-          "Phone already in use. Would you like to restore your account?");
+    public AuthResponse login(LoginRequest request) {
+        String email = request.getEmail().toLowerCase().trim();
+
+        try {
+            authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, request.getPassword()));
+        } catch (DisabledException ex) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account is disabled");
+        } catch (LockedException ex) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account is locked");
+        } catch (BadCredentialsException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+        } catch (AuthenticationException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication failed");
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+        if (!user.isEmailVerified()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Email not verified");
+        }
+
+        try {
+            String accessToken = jwtService.generateToken(user);
+            String refreshToken = refreshTokenService.create(user).getToken();
+            return new AuthResponse(accessToken, refreshToken);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to generate tokens");
+        }
     }
 
-    // Поиск роли USER
-    Role userRole = roleRepository.findByCode("USER")
-        .orElseThrow(() -> {
-          log.error("Роль USER не найдена в системе");
-          return new RuntimeException("Default role USER not found");
-        });
-
-    try {
-      // Создание пользователя
-      User user = User.builder()
-          .email(request.getEmail().toLowerCase().trim())
-          .passwordHash(passwordEncoder.encode(request.getPassword()))
-          .firstName(request.getFirstName().trim())
-          .lastName(request.getLastName().trim())
-          .phone(request.getPhone().trim())
-          .roles(Set.of(userRole))
-          .createdAt(LocalDateTime.now())
-          .build();
-
-      User savedUser = userRepository.save(user);
-      log.info("Пользователь {} успешно создан с ID: {}", savedUser.getEmail(), savedUser.getId());
-
-      // Генерация токенов
-      String accessToken = jwtService.generateToken(savedUser);
-      log.debug("JWT токен сгенерирован для нового пользователя: {}", savedUser.getEmail());
-
-      return new AuthResponse(accessToken, null); // refresh не нужен при регистрации
-    } catch (Exception e) {
-      log.error("Ошибка при создании пользователя {}: {}", request.getEmail(), e.getMessage(), e);
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create user");
-    }
-  }
-
-  public AuthResponse login(LoginRequest request) {
-    String email = request.getEmail().toLowerCase().trim();
-    log.info("Начало процесса аутентификации для email: {}", email);
-
-    try {
-      // Аутентификация через Spring Security
-      authManager.authenticate(
-          new UsernamePasswordAuthenticationToken(email, request.getPassword()));
-      log.debug("Аутентификация Spring Security прошла успешно для: {}", email);
-    } catch (DisabledException ex) {
-      log.warn("Попытка входа заблокированного пользователя: {}", email);
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account is disabled");
-    } catch (LockedException ex) {
-      log.warn("Попытка входа заблокированного пользователя: {}", email);
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account is locked");
-    } catch (BadCredentialsException ex) {
-      log.warn("Неверные учетные данные для пользователя: {}", email);
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
-    } catch (AuthenticationException ex) {
-      log.warn("Ошибка аутентификации для пользователя {}: {}", email, ex.getMessage());
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication failed");
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email.toLowerCase().trim())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    // Получение пользователя из БД
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> {
-          log.error("Пользователь {} не найден после успешной аутентификации", email);
-          return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
-        });
+    @Transactional
+    public void verifyEmail(String token) {
+        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired token"));
 
-    try {
-      // Генерация токенов
-      String accessToken = jwtService.generateToken(user);
-      String refreshToken = refreshTokenService.create(user).getToken();
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token expired");
+        }
 
-      log.info("Токены успешно сгенерированы для пользователя: {}", email);
-      log.debug("Пользователь {} успешно вошел в систему", email);
+        User user = verificationToken.getUser();
+        user.setEmailVerified(true);
+        userRepository.save(user);
 
-      return new AuthResponse(accessToken, refreshToken);
-    } catch (Exception e) {
-      log.error("Ошибка при генерации токенов для пользователя {}: {}", email, e.getMessage(), e);
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to generate tokens");
+        tokenRepository.delete(verificationToken);
+        log.info("Email {} успешно подтвержден", user.getEmail());
     }
-  }
-
-  public User getUserByEmail(String email) {
-    String normalizedEmail = email.toLowerCase().trim();
-    log.debug("Поиск пользователя по email: {}", normalizedEmail);
-
-    return userRepository.findByEmail(normalizedEmail)
-        .orElseThrow(() -> {
-          log.warn("Пользователь с email {} не найден", normalizedEmail);
-          return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        });
-  }
 }

@@ -22,7 +22,7 @@ public class EmailService {
     @Value("${MAIL_FROM}")
     private String fromEmail;
 
-    @Value("${{MAIL_REPLY_TO:}")
+    @Value("${MAIL_REPLY_TO:}")
     private String replyTo; // опционально
 
     public void sendConfirmationEmail(NewsletterSubscriber subscriber) {
