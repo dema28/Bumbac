@@ -42,8 +42,8 @@ fi
 # Ждём старт Spring
 sleep 20
 
-# Frontend
-echo "🎨 Frontend..."
+# Frontend (prod mode)
+echo "🎨 Frontend (prod)..."
 cd ~/projects/staging/YearnBumbacFront-staging
 if [ -f .env.staging ]; then
     screen -dmS frontend-staging bash -c '
@@ -52,7 +52,8 @@ if [ -f .env.staging ]; then
         if [ ! -d node_modules ]; then
             npm ci --silent
         fi
-        npm run dev -- --host 0.0.0.0 --port 3002 | tee staging_frontend.log
+        npm run build
+        HOST=127.0.0.1 PORT=3002 node .output/server/index.mjs | tee staging_frontend.log
     '
 else
     screen -dmS frontend-staging bash -c '
@@ -60,9 +61,11 @@ else
         if [ ! -d node_modules ]; then
             npm ci --silent
         fi
-        npm run dev -- --host 0.0.0.0 --port 3002 | tee staging_frontend.log
+        npm run build
+        HOST=127.0.0.1 PORT=3002 node .output/server/index.mjs | tee staging_frontend.log
     '
 fi
+
 
 echo "✅ STAGING поднят."
 

@@ -29,12 +29,15 @@ test-output/
 ############################
 # Backend Config & Runtime
 ############################
-# Environment
-.env
-.env*
+
+# Env files (кроме примера)
 backend/.env
 backend/.env.local
-backend/application-*.yml
+backend/.env.staging
+backend/.env.prod
+!backend/.env*.example
+!.env*.example
+
 
 # Logs
 backend/logs/
@@ -47,6 +50,9 @@ backend/storage/messages/
 backend/storage/uploads/
 backend/storage/tmp/
 
+# Игнорируем все локальные bat-файлы
+backend/scripts/local/*.bat
+
 ############################
 # Frontend (Nuxt / Node.js)
 ############################
@@ -57,8 +63,10 @@ dist/
 
 # Local envs
 .env.local
-.env.development
-.env.production
+.env.staging
+.env.prod
+.env.*
+!.env.example
 
 # NPM/Yarn logs
 npm-debug.log*
@@ -71,6 +79,7 @@ yarn-error.log*
 # Allure reports
 allure-results/
 allure-report/
+target/site/allure-maven-plugin/
 
 # Newman / Postman
 newman/
@@ -102,6 +111,7 @@ pytest-cache/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+!.idea/runConfigurations/
 
 # VSCode
 .vscode/
@@ -128,6 +138,7 @@ pytest-cache/
 docker-compose.override.yml
 docker-compose.local.yml
 volumes/
+*/volumes/
 *.pid
 *.seed
 *.db

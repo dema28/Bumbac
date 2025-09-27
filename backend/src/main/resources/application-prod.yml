@@ -2,9 +2,9 @@ server:
   port: ${SERVER_PORT}
   address: ${SERVER_ADDRESS:0.0.0.0}
   servlet:
-    context-path: ${SERVER_CONTEXT_PATH:/api}
+    context-path: ${SERVER_CONTEXT_PATH:}
   error:
-    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:on_param}
+    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:never}
 
 spring:
   datasource:
@@ -13,7 +13,7 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maximum-pool-size: ${DB_POOL_SIZE:15}
+      maximum-pool-size: ${DB_POOL_SIZE:20}
       minimum-idle: ${DB_POOL_MIN_IDLE:5}
 
   jpa:
@@ -26,17 +26,17 @@ spring:
     open-in-view: false
 
   mail:
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:1025}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     protocol: ${MAIL_PROTOCOL:smtp}
     properties:
       mail:
         smtp:
-          auth: ${MAIL_SMTP_AUTH:false}
+          auth: ${MAIL_SMTP_AUTH:true}
           starttls:
-            enable: ${MAIL_STARTTLS:false}
+            enable: ${MAIL_STARTTLS:true}
 
   flyway:
     enabled: ${FLYWAY_ENABLED:true}
@@ -50,7 +50,7 @@ management:
         include: ${MANAGEMENT_ENDPOINTS:health,info,metrics}
   endpoint:
     health:
-      show-details: ${HEALTH_SHOW_DETAILS:when_authorized}
+      show-details: ${HEALTH_SHOW_DETAILS:never}
 
 springdoc:
   api-docs:
@@ -60,14 +60,14 @@ springdoc:
 
 logging:
   level:
-    com.bumbac: ${LOG_LEVEL_APP:DEBUG}
-    org.springframework: ${LOG_LEVEL_SPRING:INFO}
+    com.bumbac: ${LOG_LEVEL_APP:INFO}
+    org.springframework: ${LOG_LEVEL_SPRING:WARN}
     org.hibernate: ${LOG_LEVEL_HIBERNATE:WARN}
-    org.springframework.security: ${LOG_LEVEL_SECURITY:DEBUG}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
   file:
-    name: ${LOG_FILE:/app/logs/bumbac-staging.log}
+    name: ${LOG_FILE:/app/logs/bumbac-prod.log}
   logback:
     rollingpolicy:
-      max-file-size: ${LOG_MAX_FILE_SIZE:50MB}
-      max-history: ${LOG_MAX_HISTORY:30}
-      total-size-cap: ${LOG_TOTAL_SIZE_CAP:500MB}
+      max-file-size: ${LOG_MAX_FILE_SIZE:100MB}
+      max-history: ${LOG_MAX_HISTORY:60}
+      total-size-cap: ${LOG_TOTAL_SIZE_CAP:1GB}

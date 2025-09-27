@@ -1,22 +1,34 @@
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:86400000}
-
+# Основной конфигурационный файл для всех окружений
 spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}  # local по умолчанию, но можно переопределить
+  config:
+    import: optional:file:.env.${spring.profiles.active}  # Динамическая загрузка .env файла
+  
+  # Datasource - вынесено в переменные окружения
   datasource:
-    url: jdbc:mysql://localhost:3306/yarn_store
-    username: denis
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE}
+      minimum-idle: ${DB_POOL_MIN_IDLE}
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
 
+  # JPA конфигурация
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: ${JPA_FORMAT_SQL:true}
+        dialect: org.hibernate.dialect.MySQLDialect
 
+  # Cache
   cache:
     type: simple
     cache-names:
@@ -32,94 +44,124 @@ spring:
       - shipments
       - favorites
 
+  # Mail configuration
   mail:
-    host: smtp-relay.brevo.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     protocol: smtp
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${MAIL_SMTP_AUTH:false}
           starttls:
-            enable: true
+            enable: ${MAIL_STARTTLS:false}
+    test-connection: false
 
+  # Jackson
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+  # Main
+  main:
+    allow-bean-definition-overriding: true
+
+  # Multipart
+  servlet:
+    multipart:
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:10MB}
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:10MB}
+
+  # MVC
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
 
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
-
-  main:
-    allow-bean-definition-overriding: true
-
+# Server configuration
+server:
+  port: ${SERVER_PORT}
+  address: ${SERVER_ADDRESS}
   servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+    context-path: ${SERVER_CONTEXT_PATH:}
+  error:
+    include-stacktrace: ${SERVER_ERROR_INCLUDE_STACKTRACE:on_param}
 
-# Конфигурация медиафайлов
+# JWT configuration
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+# Application specific configuration
 app:
-  mail:
-    from: ${MAIL_FROM:noreply@bumbac.md}
-
   media:
     upload-dir: ${MEDIA_UPLOAD_DIR:uploads/}
-    base-url: ${MEDIA_BASE_URL:http://localhost:8080/media/}
-    max-file-size: 10MB
-    allowed-formats: jpg,jpeg,png,gif,webp
-
-  # Конфигурация заказов
+    base-url: ${MEDIA_BASE_URL}
+    max-file-size: ${MEDIA_MAX_FILE_SIZE:10MB}
+    allowed-formats: ${MEDIA_ALLOWED_FORMATS:jpg,jpeg,png,gif,webp}
+  
   order:
-    default-status: NEW
-    max-items-per-order: 100
-    max-total-amount: 10000.00
-    auto-clear-cart: true
-
-  # Конфигурация безопасности и rate limiting
+    default-status: ${ORDER_DEFAULT_STATUS}
+    max-items-per-order: ${ORDER_MAX_ITEMS}
+    max-total-amount: ${ORDER_MAX_TOTAL}
+    auto-clear-cart: ${ORDER_AUTO_CLEAR_CART}
+  
   security:
     rate-limit:
-      requests-per-minute: ${RATE_LIMIT_REQUESTS_PER_MINUTE:3}
-      burst-capacity: ${RATE_LIMIT_BURST_CAPACITY:5}
-      login-attempts-per-minute: ${RATE_LIMIT_LOGIN_ATTEMPTS_PER_MINUTE:5}
-      login-burst-capacity: ${RATE_LIMIT_LOGIN_BURST_CAPACITY:8}
+      requests-per-minute: ${RATE_LIMIT_REQUESTS_PER_MINUTE}
+      burst-capacity: ${RATE_LIMIT_BURST_CAPACITY}
+      login-attempts-per-minute: ${RATE_LIMIT_LOGIN_ATTEMPTS_PER_MINUTE}
+      login-burst-capacity: ${RATE_LIMIT_LOGIN_BURST_CAPACITY}
 
+# SpringDoc/Swagger configuration
 springdoc:
   api-docs:
     path: /v3/api-docs
+    enabled: ${SPRINGDOC_ENABLED:true}
   swagger-ui:
     path: /swagger-ui.html
+    enabled: ${SWAGGER_UI_ENABLED:true}
     operationsSorter: method
     tagsSorter: alpha
     display-request-duration: true
     try-it-out-enabled: true
   default-produces-media-type: application/json
 
+# Management endpoints
 management:
   endpoints:
     web:
       exposure:
-        include: [health, info, prometheus, metrics]
+        include: ${MANAGEMENT_ENDPOINTS:health,info,metrics}
   endpoint:
     health:
-      show-details: always
+      show-details: ${HEALTH_SHOW_DETAILS:always}
+      probes:
+        enabled: true
+  health:
+    db:
+      enabled: true
+    mail:
+      enabled: ${MAIL_HEALTH_CHECK_ENABLED:false}
 
+# Logging configuration  
 logging:
   level:
-    root: INFO
-    com.bumbac: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
-  file:
-    name: logs/bumbac-app.log
+    com.bumbac: ${LOG_LEVEL_APP:INFO}
+    org.springframework: ${LOG_LEVEL_SPRING:INFO}
+    org.hibernate: ${LOG_LEVEL_HIBERNATE:WARN}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE}
   logback:
     rollingpolicy:
-      max-file-size: 10MB
-      max-history: 30
-      total-size-cap: 100MB
+      max-file-size: ${LOG_MAX_FILE_SIZE:10MB}
+      max-history: ${LOG_MAX_HISTORY:30}
+      total-size-cap: ${LOG_TOTAL_SIZE_CAP:100MB}
