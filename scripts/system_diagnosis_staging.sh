@@ -10,6 +10,11 @@ echo "Пользователь: $(whoami)"
 echo "Хост: $(hostname)"
 echo ""
 
+# Загружаем переменные окружения
+if [ -f ~/projects/staging/Bumbac-staging/backend/.env.staging ]; then
+    export $(grep -v '^#' ~/projects/staging/Bumbac-staging/backend/.env.staging | xargs)
+fi
+
 print_header() {
     echo ""
     echo "📊 $1"
@@ -187,11 +192,11 @@ fi
 # 13. СРАВНЕНИЕ PROD vs STAGING (ВСЕ ТАБЛИЦЫ)
 print_header "СРАВНЕНИЕ PROD vs STAGING"
 
-if mysql -u denis --password=Himik28@good -e "SELECT 1;" yarn_store >/dev/null 2>&1 && \
-   mysql -u denis --password=Himik28@good -e "SELECT 1;" yarn_store_staging >/dev/null 2>&1; then
+if mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SELECT 1;" "$MYSQL_DB_PROD" >/dev/null 2>&1 && \
+   mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" -e "SELECT 1;" "$MYSQL_DB_STAGING" >/dev/null 2>&1; then
 
-    prod_tables=$(mysql -u denis --password=Himik28@good yarn_store -e "SHOW TABLES;" | tail -n +2)
-    staging_tables=$(mysql -u denis --password=Himik28@good yarn_store_staging -e "SHOW TABLES;" | tail -n +2)
+    prod_tables=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" "$MYSQL_DB_PROD" -e "SHOW TABLES;" | tail -n +2)
+    staging_tables=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" "$MYSQL_DB_STAGING" -e "SHOW TABLES;" | tail -n +2)
 
     prod_count=$(echo "$prod_tables" | wc -l)
     staging_count=$(echo "$staging_tables" | wc -l)
@@ -210,8 +215,8 @@ if mysql -u denis --password=Himik28@good -e "SELECT 1;" yarn_store >/dev/null 2
     echo ""
     echo "📋 Сравнение количества строк в таблицах:"
     for table in $prod_tables; do
-        prod_rows=$(mysql -u denis --password=Himik28@good yarn_store -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
-        staging_rows=$(mysql -u denis --password=Himik28@good yarn_store_staging -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
+        prod_rows=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" "$MYSQL_DB_PROD" -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
+        staging_rows=$(mysql -u "$MYSQL_USER" -p"$MYSQL_PASS" "$MYSQL_DB_STAGING" -e "SELECT COUNT(*) FROM $table;" 2>/dev/null | tail -1)
 
         if [ -n "$prod_rows" ] && [ -n "$staging_rows" ]; then
             if [ "$prod_rows" -eq "$staging_rows" ]; then
